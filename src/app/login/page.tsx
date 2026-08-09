@@ -15,7 +15,7 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
   const nextPath =
     params.next?.startsWith("/") && !params.next.startsWith("//")
       ? params.next
-      : "/dashboard";
+      : "/profile";
 
   return (
     <main className="flex min-h-dvh items-center justify-center bg-background px-6 py-12">

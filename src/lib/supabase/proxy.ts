@@ -97,7 +97,7 @@ export async function updateSession(request: NextRequest) {
     if (profile.role === "admin") {
       if (pathname.startsWith("/onboarding") || pathname === "/login") {
         const redirectResponse = NextResponse.redirect(
-          new URL("/dashboard", request.url)
+          new URL("/profile", request.url)
         );
         copyResponseCookies(supabaseResponse, redirectResponse);
 
@@ -117,7 +117,7 @@ export async function updateSession(request: NextRequest) {
 
     if (roleProfile && (pathname.startsWith("/onboarding") || pathname === "/login")) {
       const redirectResponse = NextResponse.redirect(
-        new URL("/dashboard", request.url)
+        new URL("/profile", request.url)
       );
       copyResponseCookies(supabaseResponse, redirectResponse);
 
