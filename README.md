@@ -37,4 +37,5 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/bui
 
 
 Activity Diagram : https://drive.google.com/file/d/12wZiJhFOMasdtSo7SxBUUyLo7OQKWeQo/view?usp=sharing
-swimlane diagram : https://app.mockflow.com/iview/Mee2d895c1237fb18b1838b1b5317f13b1786473137938#/mode/view
+Swimlane Diagram : https://app.mockflow.com/iview/Mee2d895c1237fb18b1838b1b5317f13b1786473137938#/mode/view
+Sequence Diagram : https://drive.google.com/file/d/1nLBtwyhV4y6JHoTbqqBjhwbNCO0SM4a8/view?usp=sharing
