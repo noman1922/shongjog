@@ -30,21 +30,3 @@ export async function getMessagingActor() {
 
   return { error: null, profile, supabase, user };
 }
-
-export async function verifyConversationMembership({
-  conversationId,
-  userId,
-}: {
-  conversationId: string;
-  userId: string;
-}) {
-  const supabase = await createClient();
-  const { data } = await supabase
-    .from("conversation_members")
-    .select("conversation_id")
-    .eq("conversation_id", conversationId)
-    .eq("user_id", userId)
-    .maybeSingle();
-
-  return Boolean(data);
-}

@@ -2,31 +2,14 @@
 
 import { ArrowLeft, Send, Trash2 } from "lucide-react";
 import Link from "next/link";
-import {
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-  useTransition,
-} from "react";
+import { useRef, useState } from "react";
 
 import {
   deleteOwnMessageAction,
-  markConversationReadAction,
   sendMessageAction,
 } from "@/app/messages/actions";
-import { createClient } from "@/lib/supabase/client";
 import type { ConversationThread } from "@/lib/messages/types";
 import { cn } from "@/lib/utils";
-
-type RealtimeMessage = {
-  content: string;
-  conversation_id: string;
-  created_at: string;
-  deleted_at: string | null;
-  id: string;
-  sender_id: string;
-};
 
 function formatTimestamp(value: string) {
   return new Intl.DateTimeFormat("en", {
@@ -56,59 +39,7 @@ export function MessageThread({
   const [messages, setMessages] = useState(thread.messages);
   const [sendError, setSendError] = useState<string | null>(null);
   const [isSending, setIsSending] = useState(false);
-  const [, startTransition] = useTransition();
   const formRef = useRef<HTMLFormElement>(null);
-  const supabase = useMemo(() => createClient(), []);
-
-  useEffect(() => {
-    const channel = supabase
-      .channel(`conversation:${thread.conversationId}`)
-      .on(
-        "postgres_changes",
-        {
-          event: "INSERT",
-          filter: `conversation_id=eq.${thread.conversationId}`,
-          schema: "public",
-          table: "messages",
-        },
-        (payload) => {
-          const row = payload.new as RealtimeMessage;
-
-          if (row.deleted_at) {
-            return;
-          }
-
-          setMessages((current) => {
-            if (current.some((message) => message.id === row.id)) {
-              return current;
-            }
-
-            return [
-              ...current,
-              {
-                content: row.content,
-                createdAt: row.created_at,
-                deletedAt: row.deleted_at,
-                id: row.id,
-                isOwn: row.sender_id === currentUserId,
-                senderId: row.sender_id,
-              },
-            ];
-          });
-
-          if (row.sender_id !== currentUserId) {
-            startTransition(() => {
-              void markConversationReadAction(thread.conversationId);
-            });
-          }
-        }
-      )
-      .subscribe();
-
-    return () => {
-      void supabase.removeChannel(channel);
-    };
-  }, [currentUserId, startTransition, supabase, thread.conversationId]);
 
   return (
     <section className="flex min-h-[calc(100dvh-8rem)] flex-col overflow-hidden rounded-xl border border-[#BFC9C3] bg-white shadow-[0_4px_12px_rgba(30,41,59,0.04)] lg:min-h-[calc(100dvh-7rem)]">

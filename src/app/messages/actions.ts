@@ -5,8 +5,14 @@ import { redirect } from "next/navigation";
 import { z } from "zod";
 
 import { getMessagingActor } from "@/lib/messages/permissions";
+import {
+  deleteOwnMessage,
+  findOrCreateConversation,
+  sendMessage,
+} from "@/lib/mongodb/messages";
 
 const uuidSchema = z.uuid();
+const objectIdSchema = z.string().regex(/^[0-9a-f]{24}$/i);
 
 const sendMessageSchema = z.object({
   content: z
@@ -14,7 +20,7 @@ const sendMessageSchema = z.object({
     .trim()
     .min(1, "Write a message first.")
     .max(2000, "Messages must be 2,000 characters or fewer."),
-  conversationId: z.uuid(),
+  conversationId: objectIdSchema,
 });
 
 export type SendMessageState = {
@@ -43,7 +49,7 @@ function refreshMessages(conversationId?: string) {
 
 export async function startConversationAction(formData: FormData) {
   const parsed = uuidSchema.safeParse(formString(formData, "otherUserId"));
-  const { error, supabase, user } = await getMessagingActor();
+  const { error, user } = await getMessagingActor();
 
   if (!parsed.success) {
     redirect("/messages?error=invalid_target");
@@ -57,42 +63,23 @@ export async function startConversationAction(formData: FormData) {
     redirect("/messages?error=self_message");
   }
 
-  const [outgoing, incoming] = await Promise.all([
-    supabase
-      .from("connections")
-      .select("id")
-      .eq("requester_id", user.id)
-      .eq("receiver_id", parsed.data)
-      .eq("status", "accepted")
-      .maybeSingle(),
-    supabase
-      .from("connections")
-      .select("id")
-      .eq("requester_id", parsed.data)
-      .eq("receiver_id", user.id)
-      .eq("status", "accepted")
-      .maybeSingle(),
-  ]);
+  let conversationId: string;
 
-  if (!outgoing.data && !incoming.data) {
-    redirect("/messages?error=not_connected");
-  }
-
-  const { data, error: rpcError } = await supabase.rpc(
-    "start_direct_conversation",
-    { other_user_id: parsed.data }
-  );
-
-  if (rpcError || typeof data !== "string") {
+  try {
+    const conversation = await findOrCreateConversation(user.id, parsed.data);
+    conversationId = conversation.id;
+    refreshMessages(conversationId);
+  } catch (conversationError) {
     redirect(
       `/messages?error=${encodeURIComponent(
-        rpcError?.message ?? "conversation_creation_failed"
+        conversationError instanceof Error
+          ? conversationError.message
+          : "conversation_creation_failed"
       )}`
     );
   }
 
-  refreshMessages(data);
-  redirect(`/messages/${data}`);
+  redirect(`/messages/${conversationId}`);
 }
 
 export async function sendMessageAction(
@@ -103,7 +90,7 @@ export async function sendMessageAction(
     content: formString(formData, "content"),
     conversationId: formString(formData, "conversationId"),
   });
-  const { error, supabase, user } = await getMessagingActor();
+  const { error, user } = await getMessagingActor();
 
   if (!parsed.success) {
     return {
@@ -116,91 +103,56 @@ export async function sendMessageAction(
     return { error: error ?? "Please sign in again.", submittedAt: Date.now() };
   }
 
-  const { data: membership, error: membershipError } = await supabase
-    .from("conversation_members")
-    .select("conversation_id")
-    .eq("conversation_id", parsed.data.conversationId)
-    .eq("user_id", user.id)
-    .maybeSingle();
+  try {
+    const message = await sendMessage(
+      parsed.data.conversationId,
+      user.id,
+      parsed.data.content
+    );
 
-  if (membershipError || !membership) {
+    refreshMessages(parsed.data.conversationId);
+
     return {
-      error: "You do not have access to this conversation.",
+      message: {
+        content: message.content,
+        createdAt: message.createdAt,
+        id: message.id,
+        senderId: message.senderId,
+      },
+      submittedAt: Date.now(),
+    };
+  } catch (sendError) {
+    return {
+      error: sendError instanceof Error ? sendError.message : "Could not send message.",
       submittedAt: Date.now(),
     };
   }
-
-  const { data: message, error: insertError } = await supabase
-    .from("messages")
-    .insert({
-      content: parsed.data.content,
-      conversation_id: parsed.data.conversationId,
-      sender_id: user.id,
-    })
-    .select("id, sender_id, content, created_at")
-    .single();
-
-  if (insertError || !message) {
-    return {
-      error: insertError?.message ?? "Could not send message.",
-      submittedAt: Date.now(),
-    };
-  }
-
-  await supabase
-    .from("conversation_members")
-    .update({ last_read_at: new Date().toISOString() })
-    .eq("conversation_id", parsed.data.conversationId)
-    .eq("user_id", user.id);
-
-  refreshMessages(parsed.data.conversationId);
-
-  return {
-    message: {
-      content: message.content,
-      createdAt: message.created_at,
-      id: message.id,
-      senderId: message.sender_id,
-    },
-    submittedAt: Date.now(),
-  };
 }
 
 export async function deleteOwnMessageAction(formData: FormData) {
   const conversationId = formString(formData, "conversationId");
   const messageId = formString(formData, "messageId");
-  const parsedConversationId = uuidSchema.safeParse(conversationId);
-  const parsedMessageId = uuidSchema.safeParse(messageId);
-  const { error, supabase, user } = await getMessagingActor();
+  const parsedConversationId = objectIdSchema.safeParse(conversationId);
+  const parsedMessageId = objectIdSchema.safeParse(messageId);
+  const { error, user } = await getMessagingActor();
 
   if (!parsedConversationId.success || !parsedMessageId.success || error || !user) {
     redirect("/messages");
   }
 
-  await supabase
-    .from("messages")
-    .update({ deleted_at: new Date().toISOString() })
-    .eq("id", parsedMessageId.data)
-    .eq("conversation_id", parsedConversationId.data)
-    .eq("sender_id", user.id);
+  await deleteOwnMessage(parsedConversationId.data, user.id, parsedMessageId.data);
 
   refreshMessages(parsedConversationId.data);
   redirect(`/messages/${parsedConversationId.data}`);
 }
 
 export async function markConversationReadAction(conversationId: string) {
-  const parsed = uuidSchema.safeParse(conversationId);
-  const { error, supabase, user } = await getMessagingActor();
+  const parsed = objectIdSchema.safeParse(conversationId);
+  const { error, user } = await getMessagingActor();
 
   if (!parsed.success || error || !user) {
     return;
   }
-
-  await supabase
-    .from("conversation_members")
-    .update({ last_read_at: new Date().toISOString() })
-    .eq("conversation_id", parsed.data)
-    .eq("user_id", user.id);
 
   refreshMessages(parsed.data);
 }

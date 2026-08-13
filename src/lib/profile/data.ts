@@ -11,6 +11,9 @@ import type {
   PublicProfile,
 } from "@/lib/profile/types";
 
+const PROFILE_EXPERIENCE_LIMIT = 20;
+const PROFILE_PROJECT_LIMIT = 24;
+
 type DbProfileUser = {
   avatar_url: string | null;
   bio: string | null;
@@ -145,7 +148,8 @@ async function getProjects(userId: string): Promise<ProfileProject[]> {
     .from("projects")
     .select("id, title, description, project_url, image_url")
     .eq("user_id", userId)
-    .order("updated_at", { ascending: false });
+    .order("updated_at", { ascending: false })
+    .limit(PROFILE_PROJECT_LIMIT);
 
   return (data ?? []).map((project) => ({
     description: project.description,
@@ -162,7 +166,8 @@ async function getExperiences(userId: string): Promise<ProfileExperience[]> {
     .from("experiences")
     .select("id, company, position, description, start_date, end_date, is_current")
     .eq("user_id", userId)
-    .order("start_date", { ascending: false, nullsFirst: false });
+    .order("start_date", { ascending: false, nullsFirst: false })
+    .limit(PROFILE_EXPERIENCE_LIMIT);
 
   return (data ?? []).map((experience) => ({
     company: experience.company,
@@ -213,7 +218,10 @@ async function composeProfile(
 
 export const getOwnProfile = cache(async () => {
   const supabase = await createClient();
-  const viewerUserId = await getAuthenticatedUserId();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  const viewerUserId = user?.id ?? null;
 
   if (!viewerUserId) {
     return null;
@@ -234,7 +242,10 @@ export const getOwnProfile = cache(async () => {
 
 export const getProfileByUsername = cache(async (username: string) => {
   const supabase = await createClient();
-  const viewerUserId = await getAuthenticatedUserId();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  const viewerUserId = user?.id ?? null;
   const { data } = await supabase
     .from("users")
     .select("id, role, full_name, username, avatar_url, bio")

@@ -11,6 +11,8 @@ import type {
   ProfileConnectionState,
 } from "@/lib/connections/types";
 
+const CONNECTIONS_OVERVIEW_LIMIT = 150;
+
 type DbConnection = {
   created_at: string;
   id: string;
@@ -142,7 +144,8 @@ export const getConnectionsOverview = cache(async (): Promise<ConnectionsOvervie
     .select("id, requester_id, receiver_id, status, created_at")
     .or(`requester_id.eq.${user.id},receiver_id.eq.${user.id}`)
     .in("status", ["pending", "accepted"])
-    .order("updated_at", { ascending: false });
+    .order("updated_at", { ascending: false })
+    .limit(CONNECTIONS_OVERVIEW_LIMIT);
 
   const connections = (data ?? []) as DbConnection[];
   const users = await getUsersById(

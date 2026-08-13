@@ -43,7 +43,7 @@ export default async function ConversationPage({
 
   const { conversationId } = await params;
 
-  if (!/^[0-9a-f-]{36}$/i.test(conversationId)) {
+  if (!/^[0-9a-f]{24}$/i.test(conversationId)) {
     notFound();
   }
 
