@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Sifat Ullah - Alumni Profile</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Plus+Jakarta+Sans:wght@600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                            "inverse-surface": "#2e312f",
+                            "on-tertiary": "#ffffff",
+                            "surface-container-low": "#f2f4f1",
+                            "on-tertiary-container": "#49d6c3",
+                            "tertiary-fixed-dim": "#4fdbc8",
+                            "on-error": "#ffffff",
+                            "on-primary-fixed-variant": "#00513f",
+                            "outline-variant": "#bfc9c3",
+                            "tertiary-container": "#005a50",
+                            "inverse-primary": "#90d4bc",
+                            "error": "#ba1a1a",
+                            "on-surface": "#191c1b",
+                            "on-tertiary-fixed-variant": "#005048",
+                            "on-error-container": "#93000a",
+                            "on-secondary-fixed-variant": "#3c475a",
+                            "inverse-on-surface": "#eff1ee",
+                            "on-secondary-container": "#586377",
+                            "surface-tint": "#256956",
+                            "surface-variant": "#e1e3e0",
+                            "primary": "#004132",
+                            "on-primary-container": "#8ccfb7",
+                            "on-secondary": "#ffffff",
+                            "surface-container-lowest": "#ffffff",
+                            "error-container": "#ffdad6",
+                            "primary-fixed-dim": "#90d4bc",
+                            "secondary": "#545f73",
+                            "on-tertiary-fixed": "#00201c",
+                            "on-secondary-fixed": "#111c2d",
+                            "surface-dim": "#d8dbd7",
+                            "outline": "#6f7974",
+                            "background": "#f8faf7",
+                            "surface": "#f8faf7",
+                            "primary-fixed": "#acf1d7",
+                            "surface-bright": "#f8faf7",
+                            "primary-container": "#0f5a47",
+                            "surface-container": "#eceeeb",
+                            "secondary-fixed-dim": "#bcc7de",
+                            "tertiary-fixed": "#71f8e4",
+                            "on-surface-variant": "#3f4945",
+                            "surface-container-highest": "#e1e3e0",
+                            "secondary-container": "#d5e0f8",
+                            "surface-container-high": "#e6e9e5",
+                            "tertiary": "#004139",
+                            "secondary-fixed": "#d8e3fb",
+                            "on-primary-fixed": "#002118",
+                            "on-primary": "#ffffff",
+                            "on-background": "#191c1b"
+                    },
+                    "borderRadius": {
+                            "DEFAULT": "0.25rem",
+                            "lg": "0.5rem",
+                            "xl": "0.75rem",
+                            "full": "9999px"
+                    },
+                    "spacing": {
+                            "gutter": "24px",
+                            "margin-desktop": "32px",
+                            "base": "4px",
+                            "stack-md": "16px",
+                            "stack-sm": "8px",
+                            "container-max": "1280px",
+                            "stack-lg": "24px",
+                            "margin-mobile": "16px"
+                    },
+                    "fontFamily": {
+                            "body-lg": ["Inter"],
+                            "headline-lg": ["Plus Jakarta Sans"],
+                            "display-lg": ["Plus Jakarta Sans"],
+                            "label-sm": ["Inter"],
+                            "label-md": ["Inter"],
+                            "headline-lg-mobile": ["Plus Jakarta Sans"],
+                            "body-md": ["Inter"],
+                            "body-sm": ["Inter"],
+                            "headline-md": ["Plus Jakarta Sans"]
+                    },
+                    "fontSize": {
+                            "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                            "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "700"}],
+                            "display-lg": ["48px", {"lineHeight": "60px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                            "label-sm": ["12px", {"lineHeight": "16px", "fontWeight": "500"}],
+                            "label-md": ["14px", {"lineHeight": "20px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                            "headline-lg-mobile": ["28px", {"lineHeight": "36px", "fontWeight": "700"}],
+                            "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                            "body-sm": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                            "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "600"}]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .glass-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border: 1px solid #E2E8F0;
+            box-shadow: 0 4px 6px -1px rgba(30, 41, 59, 0.08), 0 2px 4px -1px rgba(30, 41, 59, 0.04);
+            transition: all 0.3s ease;
+        }
+        .glass-card:hover {
+            box-shadow: 0 12px 20px -3px rgba(30, 41, 59, 0.12), 0 4px 6px -2px rgba(30, 41, 59, 0.08);
+            transform: translateY(-2px);
+        }
+        .mentor-ring {
+            box-shadow: 0 0 0 2px #f8faf7, 0 0 0 4px #004132;
+        }
+        .opportunity-bar {
+            position: relative;
+        }
+        .opportunity-bar::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+            background-color: #F59E0B;
+            border-top-left-radius: 0.5rem;
+            border-bottom-left-radius: 0.5rem;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background font-body-md antialiased pt-16 lg:pt-0 lg:pl-64">
+<!-- TopNavBar (Mobile) -->
+<nav class="fixed top-0 w-full z-50 flex justify-between items-center px-gutter h-16 bg-surface shadow-sm border-b border-outline-variant lg:hidden">
+<div class="flex items-center gap-4">
+<span class="font-display-lg text-display-lg font-bold text-primary">Shongjog</span>
+</div>
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-on-surface-variant">notifications</span>
+<span class="material-symbols-outlined text-on-surface-variant">account_circle</span>
+</div>
+</nav>
+<!-- SideNavBar (Desktop) -->
+<aside class="hidden lg:flex flex-col fixed left-0 top-0 bottom-0 w-64 p-stack-md bg-surface border-r border-outline-variant z-50">
+<div class="mb-stack-lg">
+<span class="font-headline-md text-headline-md font-black text-primary">Shongjog</span>
+</div>
+<div class="flex items-center gap-3 mb-stack-lg p-3 rounded-lg bg-surface-container-low">
+<img alt="User profile photo" class="w-10 h-10 rounded-full object-cover" data-alt="A small circular profile portrait of a young South Asian man smiling in a professional setting, well-lit, shallow depth of field, modern corporate aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCtYY37_XZ2h-pt89bjw_TnHk8pQHoSCEhmcz2YdgV6Qkc-uZVC86Fio4VoaH6hplG8Y7_DfKcTDyD0-hj9pspL1BCcsLUcm0Tn84Ba3BMut3WgGG1fMhkX4CNfZQq7RUg5HvgNjfwSoixeuFGHgTEGSCHRt8hNZ0Fur5uOe9fCMbcWEp88y7SZrD6Nz_lCrN1-RLg1e6-vMJFBwr93nD_JVRGX-tDYizXXvKmbJ8jyO2MHT11HiThf"/>
+<div>
+<p class="font-label-md text-label-md text-on-surface">Tanvir Ahmed</p>
+<p class="font-body-sm text-body-sm text-on-surface-variant">University of Dhaka</p>
+</div>
+</div>
+<nav class="flex-1 flex flex-col gap-2">
+<a class="flex items-center gap-3 p-3 rounded-lg text-on-surface-variant hover:bg-surface-container-high transition-all" href="#">
+<span class="material-symbols-outlined">dynamic_feed</span>
+<span class="font-label-md text-label-md">Feed</span>
+</a>
+<a class="flex items-center gap-3 p-3 rounded-lg bg-secondary-container text-on-secondary-container font-bold" href="#">
+<span class="material-symbols-outlined">group</span>
+<span class="font-label-md text-label-md">My Network</span>
+</a>
+<a class="flex items-center gap-3 p-3 rounded-lg text-on-surface-variant hover:bg-surface-container-high transition-all" href="#">
+<span class="material-symbols-outlined">bookmark</span>
+<span class="font-label-md text-label-md">Saved Jobs</span>
+</a>
+<a class="flex items-center gap-3 p-3 rounded-lg text-on-surface-variant hover:bg-surface-container-high transition-all" href="#">
+<span class="material-symbols-outlined">mail</span>
+<span class="font-label-md text-label-md">Messages</span>
+</a>
+<a class="flex items-center gap-3 p-3 rounded-lg text-on-surface-variant hover:bg-surface-container-high transition-all" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="font-label-md text-label-md">Settings</span>
+</a>
+</nav>
+<div class="mt-auto flex flex-col gap-2 pt-4 border-t border-outline-variant">
+<a class="flex items-center gap-3 p-3 rounded-lg text-on-surface-variant hover:bg-surface-container-high transition-all" href="#">
+<span class="material-symbols-outlined">help</span>
+<span class="font-label-md text-label-md">Help Center</span>
+</a>
+<a class="flex items-center gap-3 p-3 rounded-lg text-on-surface-variant hover:bg-surface-container-high transition-all" href="#">
+<span class="material-symbols-outlined">shield</span>
+<span class="font-label-md text-label-md">Privacy</span>
+</a>
+<a class="flex items-center gap-3 p-3 rounded-lg text-on-surface-variant hover:bg-surface-container-high transition-all mt-2" href="#">
+<span class="material-symbols-outlined">logout</span>
+<span class="font-label-md text-label-md">Logout</span>
+</a>
+</div>
+</aside>
+<main class="max-w-container-max mx-auto p-margin-mobile lg:p-margin-desktop min-h-screen">
+<!-- Bento Grid Layout -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-gutter">
+<!-- Main Content Area -->
+<div class="lg:col-span-8 flex flex-col gap-gutter">
+<!-- Profile Header Card -->
+<div class="glass-card rounded-xl p-stack-lg relative overflow-hidden">
+<!-- Decorative Background Element -->
+<div class="absolute top-0 right-0 w-64 h-64 bg-primary-container rounded-full mix-blend-multiply filter blur-3xl opacity-10 -translate-y-1/2 translate-x-1/2"></div>
+<div class="flex flex-col sm:flex-row gap-stack-lg items-start sm:items-center relative z-10">
+<div class="relative">
+<img alt="Sifat Ullah Profile Picture" class="w-32 h-32 rounded-full object-cover mentor-ring" data-alt="A professional headshot of a confident South Asian man in a modern office environment, wearing a neat button-down shirt. The lighting is soft and corporate, conveying trust and experience. High quality, sharp focus." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBwmXN8wfmhBw9lEx1kKpJnfZ_4uyG_p0IawGLnkFyAHBWl3TPn1P3ml9BzWqoIgLCgMC_aeoU9z9sUpnWKMjSSNl0iYpPbKsHSg339FEdkOCBWVxIqOa_n89Z0UlnL7zzjEb0cGdBEBQwWIxIl46TYzoHvnve_U5LLzIfjrWDgwdVkjml2mJpsJayqXb66LNI8xNgXLDAtKWndPJoGg86-y4fPW0YkCWCfywjmppWzFZ3epGAY0w6p"/>
+<div class="absolute -bottom-2 -right-2 bg-primary text-on-primary font-label-sm text-label-sm px-2 py-1 rounded-full flex items-center gap-1 shadow-sm border border-surface">
+<span class="material-symbols-outlined" style="font-size: 14px;">verified</span>
+                                Mentor
+                            </div>
+</div>
+<div class="flex-1">
+<div class="flex justify-between items-start">
+<div>
+<h1 class="font-headline-lg-mobile lg:font-headline-lg text-headline-lg-mobile lg:text-headline-lg text-on-surface">Sifat Ullah</h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant mt-1">Senior SQA Engineer at Brain Station 23</p>
+</div>
+<button class="hidden sm:flex bg-primary text-on-primary font-label-md text-label-md px-4 py-2 rounded-lg items-center gap-2 hover:bg-primary-container transition-colors">
+<span class="material-symbols-outlined">send</span>
+                                    Message
+                                </button>
+</div>
+<div class="flex flex-wrap gap-2 mt-4">
+<span class="bg-surface-container-low text-secondary font-label-sm text-label-sm px-3 py-1 rounded-full border border-outline-variant flex items-center gap-1">
+<span class="material-symbols-outlined" style="font-size: 16px;">school</span>
+                                    BUET '18
+                                </span>
+<span class="bg-surface-container-low text-secondary font-label-sm text-label-sm px-3 py-1 rounded-full border border-outline-variant flex items-center gap-1">
+<span class="material-symbols-outlined" style="font-size: 16px;">location_on</span>
+                                    Dhaka, Bangladesh
+                                </span>
+</div>
+</div>
+</div>
+<button class="w-full mt-stack-md sm:hidden bg-primary text-on-primary font-label-md text-label-md px-4 py-2 rounded-lg flex items-center justify-center gap-2 hover:bg-primary-container transition-colors">
+<span class="material-symbols-outlined">send</span>
+                        Message
+                    </button>
+</div>
+<!-- About & Mentorship -->
+<div class="glass-card rounded-xl p-stack-lg">
+<h2 class="font-headline-md text-headline-md text-on-surface mb-stack-sm flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">psychology</span>
+                        Mentorship Approach
+                    </h2>
+<p class="font-body-md text-body-md text-on-surface-variant leading-relaxed">
+                        Passionate about software quality assurance and automation. I enjoy helping recent graduates navigate the transition from academia to the tech industry. Happy to review resumes, discuss QA career paths, or do mock interviews for entry-level engineering roles.
+                    </p>
+<div class="mt-stack-md flex flex-wrap gap-2">
+<span class="bg-[#F1F5F9] text-[#1e293b] font-label-sm text-label-sm px-3 py-1 rounded-full">Test Automation</span>
+<span class="bg-[#F1F5F9] text-[#1e293b] font-label-sm text-label-sm px-3 py-1 rounded-full">Career Guidance</span>
+<span class="bg-[#F1F5F9] text-[#1e293b] font-label-sm text-label-sm px-3 py-1 rounded-full">Resume Review</span>
+</div>
+</div>
+<!-- Active Posts / Opportunities -->
+<div class="glass-card rounded-xl p-stack-lg">
+<div class="flex justify-between items-center mb-stack-md">
+<h2 class="font-headline-md text-headline-md text-on-surface flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">work</span>
+                            Opportunities Posted
+                        </h2>
+<a class="font-label-md text-label-md text-primary hover:underline" href="#">View All</a>
+</div>
+<div class="flex flex-col gap-stack-sm">
+<!-- Opportunity Card -->
+<div class="border border-outline-variant rounded-lg p-4 opportunity-bar bg-surface hover:bg-surface-container-low transition-colors cursor-pointer flex gap-4 items-start">
+<div class="w-12 h-12 rounded bg-surface-container-high flex-shrink-0 flex items-center justify-center border border-outline-variant">
+<span class="material-symbols-outlined text-secondary">corporate_fare</span>
+</div>
+<div class="flex-1">
+<h3 class="font-label-md text-label-md text-on-surface">Automation Engineer Entry Level</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Brain Station 23 • On-site</p>
+<div class="flex items-center gap-4 mt-2">
+<span class="font-label-sm text-label-sm text-outline flex items-center gap-1">
+<span class="material-symbols-outlined" style="font-size: 14px;">schedule</span>
+                                        Posted 2 days ago
+                                    </span>
+<span class="font-label-sm text-label-sm text-primary flex items-center gap-1 bg-primary-container/10 px-2 py-0.5 rounded">
+<span class="material-symbols-outlined" style="font-size: 14px;">groups</span>
+                                        Direct Referral
+                                    </span>
+</div>
+</div>
+<button class="text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined">bookmark_border</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+<!-- Sidebar -->
+<div class="lg:col-span-4 flex flex-col gap-gutter">
+<!-- Company Info -->
+<div class="glass-card rounded-xl p-stack-lg">
+<h3 class="font-label-md text-label-md text-on-surface mb-stack-md">Current Company</h3>
+<div class="flex items-center gap-3">
+<div class="w-12 h-12 rounded bg-surface-container flex items-center justify-center border border-outline-variant">
+<span class="material-symbols-outlined text-secondary">business</span>
+</div>
+<div>
+<p class="font-label-md text-label-md text-on-surface">Brain Station 23</p>
+<p class="font-body-sm text-body-sm text-on-surface-variant">IT Services and IT Consulting</p>
+</div>
+</div>
+<a class="mt-4 block text-center font-label-md text-label-md text-primary border border-primary rounded-lg py-2 hover:bg-primary-container hover:text-on-primary-container transition-colors" href="#">
+                        View Company Profile
+                    </a>
+</div>
+<!-- Mutual Connections -->
+<div class="glass-card rounded-xl p-stack-lg">
+<h3 class="font-label-md text-label-md text-on-surface mb-stack-md flex justify-between items-center">
+                        Mutual Connections
+                        <span class="bg-surface-container-low text-on-surface-variant px-2 py-0.5 rounded-full text-xs">3</span>
+</h3>
+<div class="flex flex-col gap-3">
+<div class="flex items-center gap-3">
+<img alt="Mutual Connection" class="w-8 h-8 rounded-full object-cover" data-alt="Small circular profile picture of a young professional woman smiling." src="https://lh3.googleusercontent.com/aida-public/AB6AXuD-2gIoE5gGD1WhrMDZERiSWsVMuBT_xMIHYPvec2kTFy1Eg2NCUzEocfG26cE6P1tXkzXQ4uEmgOrKJAVOBCKtPSFqXAXgHs6BXxBtUyF2pML7-k2VQpys_UVn5weGgt_cSKe5azROf28iqf1OQRVuD9h2sWqrmCw9PzIYROALiIgWxPn30zLEjcN-S2b45qK7cyW4pFZwORWe3Hem7_R6Jl_LJKkGOVf9G35o_SQNmSHAOBo-rv9I"/>
+<div>
+<p class="font-label-sm text-label-sm text-on-surface">Farhana Yesmin</p>
+<p class="font-body-sm text-body-sm text-on-surface-variant text-xs">Software Engineer</p>
+</div>
+</div>
+<div class="flex items-center gap-3">
+<img alt="Mutual Connection" class="w-8 h-8 rounded-full object-cover" data-alt="Small circular profile picture of a young professional man looking confident." src="https://lh3.googleusercontent.com/aida-public/AB6AXuB3MUlcSN0w68NxOgACQ8jjYcfLHZc6iz2z47ElLXuGaenMhK_Y6eQtVVoEPn6gGs25k2X7qyH1So6GIGE_aJeXYB5DGBtWfOwHLTEN7XYIhAGxDRq3l_5qsDv3rppLQ8v8AE03Ra47HDzYczK8g7pSG52lkGFrbOVIs9UFlED3fksk86E971-SdHvG2YbH1prwQLud08YKd7QpSLwUpZePwoTOjZwlSENmEI00WCYMsqZymNEPT23q"/>
+<div>
+<p class="font-label-sm text-label-sm text-on-surface">Rahat Khan</p>
+<p class="font-body-sm text-body-sm text-on-surface-variant text-xs">Product Manager</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+</body></html>

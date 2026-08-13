@@ -47,10 +47,24 @@ export async function updateSession(request: NextRequest) {
 
   const pathname = request.nextUrl.pathname;
 
-  if (!user && pathname.startsWith("/dashboard")) {
+  if (!user && (pathname.startsWith("/dashboard") || pathname.startsWith("/messages"))) {
     const redirectUrl = request.nextUrl.clone();
-    redirectUrl.pathname = "/login";
+    redirectUrl.pathname = "/";
     redirectUrl.searchParams.set("next", pathname);
+
+    const redirectResponse = NextResponse.redirect(redirectUrl);
+    copyResponseCookies(supabaseResponse, redirectResponse);
+
+    return redirectResponse;
+  }
+
+  if (!user && pathname.startsWith("/admin")) {
+    if (pathname === "/admin/login") {
+      return supabaseResponse;
+    }
+
+    const redirectUrl = request.nextUrl.clone();
+    redirectUrl.pathname = "/admin/login";
 
     const redirectResponse = NextResponse.redirect(redirectUrl);
     copyResponseCookies(supabaseResponse, redirectResponse);
@@ -72,6 +86,7 @@ export async function updateSession(request: NextRequest) {
   if (
     user &&
     (pathname === "/login" ||
+      pathname.startsWith("/messages") ||
       pathname.startsWith("/dashboard") ||
       pathname.startsWith("/onboarding"))
   ) {
@@ -80,6 +95,32 @@ export async function updateSession(request: NextRequest) {
       .select("role")
       .eq("id", user.id)
       .maybeSingle();
+
+    if (pathname.startsWith("/admin")) {
+      if (profile?.role === "admin") {
+        if (pathname === "/admin/login") {
+          const redirectResponse = NextResponse.redirect(
+            new URL("/admin", request.url)
+          );
+          copyResponseCookies(supabaseResponse, redirectResponse);
+
+          return redirectResponse;
+        }
+
+        return supabaseResponse;
+      }
+
+      if (pathname === "/admin/login") {
+        return supabaseResponse;
+      }
+
+      const redirectResponse = NextResponse.redirect(
+        new URL("/admin/login?error=forbidden", request.url)
+      );
+      copyResponseCookies(supabaseResponse, redirectResponse);
+
+      return redirectResponse;
+    }
 
     if (!profile) {
       if (pathname.startsWith("/onboarding")) {
@@ -95,9 +136,14 @@ export async function updateSession(request: NextRequest) {
     }
 
     if (profile.role === "admin") {
-      if (pathname.startsWith("/onboarding") || pathname === "/login") {
+      if (
+        pathname.startsWith("/dashboard") ||
+        pathname.startsWith("/messages") ||
+        pathname.startsWith("/onboarding") ||
+        pathname === "/login"
+      ) {
         const redirectResponse = NextResponse.redirect(
-          new URL("/profile", request.url)
+          new URL("/admin", request.url)
         );
         copyResponseCookies(supabaseResponse, redirectResponse);
 
@@ -117,14 +163,19 @@ export async function updateSession(request: NextRequest) {
 
     if (roleProfile && (pathname.startsWith("/onboarding") || pathname === "/login")) {
       const redirectResponse = NextResponse.redirect(
-        new URL("/profile", request.url)
+        new URL("/dashboard", request.url)
       );
       copyResponseCookies(supabaseResponse, redirectResponse);
 
       return redirectResponse;
     }
 
-    if (!roleProfile && (pathname.startsWith("/dashboard") || pathname === "/login")) {
+    if (
+      !roleProfile &&
+      (pathname.startsWith("/dashboard") ||
+        pathname.startsWith("/messages") ||
+        pathname === "/login")
+    ) {
       const redirectResponse = NextResponse.redirect(
         new URL("/onboarding", request.url)
       );

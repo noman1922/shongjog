@@ -1,8 +1,15 @@
 import { notFound, redirect } from "next/navigation";
 
+import { ProfileConnectionActions } from "@/components/connections/connection-actions";
+import { StartMessageButton } from "@/components/messages/start-message-button";
 import { LinkButton } from "@/components/ui/button";
 import { ProfileView } from "@/components/profile/profile-view";
-import { getAuthenticatedUserId, getProfileByUsername } from "@/lib/profile/data";
+import { getProfileConnectionState } from "@/lib/connections/data";
+import {
+  getAuthenticatedUserId,
+  getOwnProfile,
+  getProfileByUsername,
+} from "@/lib/profile/data";
 
 type PublicProfilePageProps = {
   params: Promise<{
@@ -48,5 +55,25 @@ export default async function PublicProfilePage({
     );
   }
 
-  return <ProfileView profile={profile} />;
+  const connectionState = await getProfileConnectionState(viewerUserId, profile.id);
+  const shellProfile = await getOwnProfile();
+
+  return (
+    <ProfileView
+      connectionActions={
+        <ProfileConnectionActions
+          profileUserId={profile.id}
+          profileUsername={profile.username}
+          state={connectionState}
+        />
+      }
+      messageAction={
+        connectionState.kind === "connected" ? (
+          <StartMessageButton otherUserId={profile.id} />
+        ) : null
+      }
+      profile={profile}
+      shellProfile={shellProfile ?? profile}
+    />
+  );
 }

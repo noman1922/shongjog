@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Alumni Dashboard - Shongjog</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@600;700;800&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "primary": "#004132",
+                    "on-tertiary": "#ffffff",
+                    "on-secondary-container": "#586377",
+                    "secondary-fixed-dim": "#bcc7de",
+                    "surface-bright": "#f8faf7",
+                    "on-tertiary-fixed-variant": "#005048",
+                    "primary-fixed": "#acf1d7",
+                    "inverse-on-surface": "#eff1ee",
+                    "outline": "#6f7974",
+                    "on-primary-fixed-variant": "#00513f",
+                    "tertiary-fixed": "#71f8e4",
+                    "primary-fixed-dim": "#90d4bc",
+                    "surface-container-low": "#f2f4f1",
+                    "surface": "#f8faf7",
+                    "surface-container-high": "#e6e9e5",
+                    "inverse-primary": "#90d4bc",
+                    "secondary-container": "#d5e0f8",
+                    "error": "#ba1a1a",
+                    "surface-container": "#eceeeb",
+                    "tertiary-fixed-dim": "#4fdbc8",
+                    "surface-tint": "#256956",
+                    "error-container": "#ffdad6",
+                    "secondary-fixed": "#d8e3fb",
+                    "on-tertiary-container": "#49d6c3",
+                    "primary-container": "#0f5a47",
+                    "on-surface-variant": "#3f4945",
+                    "on-tertiary-fixed": "#00201c",
+                    "secondary": "#545f73",
+                    "on-primary": "#ffffff",
+                    "on-secondary-fixed-variant": "#3c475a",
+                    "on-secondary-fixed": "#111c2d",
+                    "on-secondary": "#ffffff",
+                    "surface-variant": "#e1e3e0",
+                    "surface-container-lowest": "#ffffff",
+                    "on-primary-fixed": "#002118",
+                    "on-background": "#191c1b",
+                    "background": "#f8faf7",
+                    "on-error-container": "#93000a",
+                    "inverse-surface": "#2e312f",
+                    "on-surface": "#191c1b",
+                    "tertiary": "#004139",
+                    "on-error": "#ffffff",
+                    "on-primary-container": "#8ccfb7",
+                    "outline-variant": "#bfc9c3",
+                    "surface-dim": "#d8dbd7",
+                    "tertiary-container": "#005a50",
+                    "surface-container-highest": "#e1e3e0"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "stack-md": "16px",
+                    "stack-sm": "8px",
+                    "gutter": "24px",
+                    "margin-mobile": "16px",
+                    "container-max": "1280px",
+                    "margin-desktop": "32px",
+                    "stack-lg": "24px",
+                    "base": "4px"
+            },
+            "fontFamily": {
+                    "body-md": ["Inter"],
+                    "label-md": ["Inter"],
+                    "headline-lg": ["Plus Jakarta Sans"],
+                    "body-lg": ["Inter"],
+                    "headline-lg-mobile": ["Plus Jakarta Sans"],
+                    "label-sm": ["Inter"],
+                    "headline-md": ["Plus Jakarta Sans"],
+                    "display-lg": ["Plus Jakarta Sans"],
+                    "body-sm": ["Inter"]
+            },
+            "fontSize": {
+                    "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                    "label-md": ["14px", {"lineHeight": "20px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                    "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "700"}],
+                    "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                    "headline-lg-mobile": ["28px", {"lineHeight": "36px", "fontWeight": "700"}],
+                    "label-sm": ["12px", {"lineHeight": "16px", "fontWeight": "500"}],
+                    "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                    "display-lg": ["48px", {"lineHeight": "60px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "body-sm": ["14px", {"lineHeight": "20px", "fontWeight": "400"}]
+            }
+          },
+        },
+      }
+    </script>
+</head>
+<body class="bg-background text-on-background font-body-md antialiased overflow-x-hidden min-h-screen">
+<!-- TopNavBar -->
+<header class="fixed top-0 w-full z-50 flex justify-between items-center px-gutter h-16 bg-surface dark:bg-inverse-surface border-b border-outline-variant shadow-sm docked full-width top-0">
+<div class="flex items-center gap-gutter">
+<span class="font-display-lg text-display-lg font-bold text-primary dark:text-primary-fixed-dim">Shongjog</span>
+<nav class="hidden md:flex gap-stack-lg ml-stack-lg">
+<a class="text-on-surface-variant font-medium hover:text-primary transition-colors flex items-center h-16 opacity-80 scale-95 transition-all" href="#">Network</a>
+<a class="text-on-surface-variant font-medium hover:text-primary transition-colors flex items-center h-16 opacity-80 scale-95 transition-all" href="#">Opportunities</a>
+<a class="text-on-surface-variant font-medium hover:text-primary transition-colors flex items-center h-16 opacity-80 scale-95 transition-all" href="#">Discussions</a>
+</nav>
+</div>
+<div class="flex items-center gap-stack-md">
+<span class="font-label-md text-label-md text-on-surface-variant hidden md:block">[Student View]</span>
+<button class="p-2 text-on-surface hover:text-primary transition-colors">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">notifications</span>
+</button>
+<button class="p-2 text-on-surface hover:text-primary transition-colors">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">account_circle</span>
+</button>
+</div>
+</header>
+<div class="flex h-screen pt-16">
+<!-- SideNavBar -->
+<aside class="hidden lg:flex flex-col fixed left-0 top-16 bottom-0 w-64 p-stack-md bg-surface dark:bg-inverse-surface border-r border-outline-variant docked left-0 h-full w-64">
+<div class="mb-stack-lg flex flex-col items-center">
+<div class="w-20 h-20 rounded-full overflow-hidden mb-stack-sm ring-2 ring-primary">
+<img class="w-full h-full object-cover" data-alt="A professional headshot of a corporate alumni mentor in a bright, modern office setting. The individual is wearing smart-casual business attire. Lighting is soft and natural, emphasizing approachability and expertise. Deep emerald green and clean white brand colors subtly influence the environment." src="https://lh3.googleusercontent.com/aida-public/AB6AXuC8liT5QcuOHVXuoc6kxEmBGUWiaWdkCUwqWFBa5RqLJixcVtIvjgHwtEoIsB2bkoR42JqTY2G0RATMypA0b4uuY9EmmaEYtmfu4yC9574cjvWRLVtjaHQ1q-6dF1mYD4FsSh5Orr291XR2oPg7nfT_AZRqWiyhNkoBpzge36W8MJC_IDmEpM9UR-2ID5zwTfgO9x54Hor0iIvfB8j_PFx_813wRKMqCQSJd2UiiLqUE5MqEVFJgKHf"/>
+</div>
+<h2 class="font-headline-sm text-headline-sm font-bold text-on-surface text-center">Sifat Ullah</h2>
+<p class="font-body-sm text-body-sm text-on-surface-variant text-center">Software Engineer</p>
+<div class="mt-stack-sm bg-primary-fixed text-on-primary-fixed-variant px-3 py-1 rounded-full font-label-sm text-label-sm">Active Mentor</div>
+</div>
+<nav class="flex-1 flex flex-col gap-stack-sm">
+<a class="flex items-center gap-stack-sm p-3 bg-secondary-container text-on-secondary-container rounded-lg font-bold scale-[0.98] duration-150" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">dynamic_feed</span>
+<span class="font-label-md text-label-md">Dashboard</span>
+</a>
+<a class="flex items-center gap-stack-sm p-3 text-on-surface-variant hover:bg-surface-container-high transition-all rounded-lg" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">group</span>
+<span class="font-label-md text-label-md">My Network</span>
+</a>
+<a class="flex items-center gap-stack-sm p-3 text-on-surface-variant hover:bg-surface-container-high transition-all rounded-lg" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">bookmark</span>
+<span class="font-label-md text-label-md">Saved Jobs</span>
+</a>
+<a class="flex items-center gap-stack-sm p-3 text-on-surface-variant hover:bg-surface-container-high transition-all rounded-lg" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">mail</span>
+<span class="font-label-md text-label-md">Messages</span>
+</a>
+<a class="flex items-center gap-stack-sm p-3 text-on-surface-variant hover:bg-surface-container-high transition-all rounded-lg" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">settings</span>
+<span class="font-label-md text-label-md">Settings</span>
+</a>
+</nav>
+<div class="mt-auto border-t border-outline-variant pt-stack-md flex flex-col gap-stack-sm">
+<a class="flex items-center gap-stack-sm p-2 text-on-surface-variant hover:bg-surface-container-high rounded-lg transition-colors" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">help</span>
+<span class="font-label-sm text-label-sm">Help Center</span>
+</a>
+<a class="flex items-center gap-stack-sm p-2 text-on-surface-variant hover:bg-surface-container-high rounded-lg transition-colors" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">shield</span>
+<span class="font-label-sm text-label-sm">Privacy</span>
+</a>
+<a class="flex items-center gap-stack-sm p-2 text-on-surface-variant hover:bg-surface-container-high rounded-lg transition-colors" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">logout</span>
+<span class="font-label-sm text-label-sm">Logout</span>
+</a>
+</div>
+</aside>
+<!-- Main Content Canvas -->
+<main class="flex-1 lg:ml-64 p-margin-mobile md:p-margin-desktop overflow-y-auto">
+<div class="max-w-container-max mx-auto space-y-gutter">
+<!-- Welcome & Primary Action -->
+<div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-stack-md bg-surface-container-lowest p-stack-lg rounded-xl border border-outline-variant shadow-sm hover:shadow-md transition-shadow relative overflow-hidden"><div class="absolute right-0 top-0 w-64 h-full bg-gradient-to-l from-primary-fixed/20 to-transparent pointer-events-none"></div><div class="z-10"><h1 class="font-headline-lg text-headline-lg text-on-surface">Welcome back, Sifat!</h1><p class="font-body-lg text-body-lg text-on-surface-variant mt-base">Share your expertise or post a new opportunity.</p></div><div class="z-10 flex flex-wrap gap-stack-sm"><button class="bg-primary text-on-tertiary px-4 py-2 rounded-lg font-label-md text-label-md hover:bg-on-primary-fixed-variant transition-colors flex items-center gap-2 shadow-sm"><span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">add</span>Post Opportunity</button><button class="bg-surface border border-outline-variant text-on-surface px-4 py-2 rounded-lg font-label-md text-label-md hover:bg-surface-container-low transition-colors flex items-center gap-2 shadow-sm"><span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">lightbulb</span>Share Advice</button><button class="bg-surface border border-outline-variant text-on-surface px-4 py-2 rounded-lg font-label-md text-label-md hover:bg-surface-container-low transition-colors flex items-center gap-2 shadow-sm"><span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">photo_camera</span>Photo</button></div></div>
+<!-- Bento Grid Layout -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-gutter">
+<!-- Your Active Postings (Spans 8 cols on desktop) -->
+<section class="lg:col-span-8 bg-surface-container-lowest rounded-xl border border-outline-variant shadow-sm p-stack-lg">
+<div class="flex justify-between items-center mb-stack-md border-b border-outline-variant pb-stack-sm">
+<h2 class="font-headline-md text-headline-md text-on-surface flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">work</span>
+                                Your Active Postings
+                            </h2>
+<a class="font-label-md text-label-md text-primary hover:underline" href="#">View All</a>
+</div>
+<div class="space-y-stack-md">
+<!-- Job Card 1 -->
+<div class="flex flex-col sm:flex-row justify-between items-start sm:items-center p-stack-md rounded-lg border border-outline-variant bg-surface hover:shadow-md transition-shadow relative overflow-hidden group">
+<div class="absolute left-0 top-0 bottom-0 w-1 bg-tertiary-container group-hover:bg-primary transition-colors"></div>
+<div>
+<h3 class="font-headline-sm text-headline-sm font-bold text-on-surface">Junior Frontend Developer</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-1">TechCorp Inc. • Remote • Posted 3d ago</p>
+</div>
+<div class="flex items-center gap-stack-md mt-stack-md sm:mt-0">
+<div class="text-center">
+<p class="font-headline-md text-headline-md text-primary">24</p>
+<p class="font-label-sm text-label-sm text-on-surface-variant">Applicants</p>
+</div>
+<div class="text-center">
+<p class="font-headline-md text-headline-md text-secondary">156</p>
+<p class="font-label-sm text-label-sm text-on-surface-variant">Views</p>
+</div>
+</div>
+</div>
+<!-- Job Card 2 -->
+<div class="flex flex-col sm:flex-row justify-between items-start sm:items-center p-stack-md rounded-lg border border-outline-variant bg-surface hover:shadow-md transition-shadow relative overflow-hidden group">
+<div class="absolute left-0 top-0 bottom-0 w-1 bg-surface-variant group-hover:bg-primary transition-colors"></div>
+<div>
+<h3 class="font-headline-sm text-headline-sm font-bold text-on-surface">UX Research Intern</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-1">TechCorp Inc. • Dhaka • Posted 1w ago</p>
+</div>
+<div class="flex items-center gap-stack-md mt-stack-md sm:mt-0">
+<div class="text-center">
+<p class="font-headline-md text-headline-md text-primary">12</p>
+<p class="font-label-sm text-label-sm text-on-surface-variant">Applicants</p>
+</div>
+<div class="text-center">
+<p class="font-headline-md text-headline-md text-secondary">89</p>
+<p class="font-label-sm text-label-sm text-on-surface-variant">Views</p>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Networking / Suggested Students (Spans 4 cols on desktop) -->
+<section class="lg:col-span-4 bg-surface-container-lowest rounded-xl border border-outline-variant shadow-sm p-stack-lg flex flex-col">
+<div class="flex justify-between items-center mb-stack-md border-b border-outline-variant pb-stack-sm">
+<h2 class="font-headline-md text-headline-md text-on-surface flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">hub</span>
+                                Suggested Students
+                            </h2>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant mb-stack-md">Based on your expertise in Software Engineering.</p>
+<div class="space-y-stack-md flex-1">
+<!-- Student Profile 1 -->
+<div class="flex items-center gap-stack-md p-3 rounded-lg hover:bg-surface transition-colors border border-transparent hover:border-outline-variant cursor-pointer">
+<div class="w-12 h-12 rounded-full overflow-hidden bg-surface-container-high flex-shrink-0">
+<img class="w-full h-full object-cover" data-alt="A portrait of a highly motivated university student studying computer science. The student looks optimistic and focused, positioned in a bright modern campus library setting. The lighting emphasizes a clean, studious atmosphere with subtle hints of emerald green in the background." src="https://lh3.googleusercontent.com/aida-public/AB6AXuD7qgZVqif9Lu2YGdQ6P4WOu0Flw_O7FmSV5_9vI1STM34IYbnEuNkT7q5VHTQ-ScgXdrKI2qTuBxXi4QUaLaKUgaaikQnPGJjs0RD6KJCJa5Sto57qfAOyZffgMMdW4Uxe-7ItEkF890PObYyGPj9sGyYX_MCsY3QIQWI2SraeWxA1ZDwK-uKWTCc1HEl3lqVlRjk1fctdfjZ4ilioLwvBajnDLCdU6RK7WfkB8I1Zueqis2EjjT6W"/>
+</div>
+<div class="flex-1 min-w-0">
+<h4 class="font-label-md text-label-md text-on-surface truncate">Rahim Uddin</h4>
+<p class="font-body-sm text-body-sm text-on-surface-variant truncate">CS Major, 3rd Year</p>
+</div>
+<button class="text-primary hover:bg-primary/10 p-2 rounded-full transition-colors flex-shrink-0">
+<span class="material-symbols-outlined text-sm" style="font-variation-settings: 'FILL' 0;">person_add</span>
+</button>
+</div>
+<!-- Student Profile 2 -->
+<div class="flex items-center gap-stack-md p-3 rounded-lg hover:bg-surface transition-colors border border-transparent hover:border-outline-variant cursor-pointer">
+<div class="w-12 h-12 rounded-full overflow-hidden bg-surface-container-high flex-shrink-0">
+<img class="w-full h-full object-cover" data-alt="A portrait of an engaged university student looking directly at the camera with a confident smile. Set in a contemporary university coworking space with lots of natural light. The visual style is crisp, clean, and professional, aligning with a premium corporate aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAsqvKg23brPOQYtxjqZUjLXdXTfHw0SvtuWiW6HJcjE_RNgRAr3Ep17snMjM1ugzU8jOqf5qerIt4ZrOFcZBxZNwTB0sPt-tNHxGincCPmZDqdzxijC-s3kDKoZbH-GMgwSG-xnDAMDUvO0WTYnPbvf5wGoVVuZPNY7BJSKb_w0qbD0EXKNt2KeJv85NJ5vd1rsr6OPPiKlTWin9JYOsWjPTdDcsFp3x14KBsM1XaWPa6hIdDFBEB-"/>
+</div>
+<div class="flex-1 min-w-0">
+<h4 class="font-label-md text-label-md text-on-surface truncate">Sadia Rahman</h4>
+<p class="font-body-sm text-body-sm text-on-surface-variant truncate">Data Science, Final Year</p>
+</div>
+<button class="text-primary hover:bg-primary/10 p-2 rounded-full transition-colors flex-shrink-0">
+<span class="material-symbols-outlined text-sm" style="font-variation-settings: 'FILL' 0;">person_add</span>
+</button>
+</div>
+</div>
+<button class="mt-stack-md w-full py-2 bg-surface text-secondary border border-outline-variant rounded-lg font-label-md text-label-md hover:bg-surface-container-low transition-colors">View All Suggestions</button>
+</section>
+</div>
+<!-- Candidate Pipeline / New Applications -->
+<section class="bg-surface-container-lowest rounded-xl border border-outline-variant shadow-sm p-stack-lg"><div class="flex justify-between items-center mb-stack-md border-b border-outline-variant pb-stack-sm"><h2 class="font-headline-md text-headline-md text-on-surface flex items-center gap-2"><span class="material-symbols-outlined text-primary">rss_feed</span>Network Feed</h2><a class="font-label-md text-label-md text-primary hover:underline" href="#">View All</a></div><div class="space-y-stack-lg"><div class="flex flex-col gap-stack-md p-stack-md rounded-lg border border-outline-variant bg-surface"><div class="flex items-center gap-3"><div class="w-10 h-10 rounded-full overflow-hidden bg-surface-container-high"><img alt="Sifat Ullah" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC8liT5QcuOHVXuoc6kxEmBGUWiaWdkCUwqWFBa5RqLJixcVtIvjgHwtEoIsB2bkoR42JqTY2G0RATMypA0b4uuY9EmmaEYtmfu4yC9574cjvWRLVtjaHQ1q-6dF1mYD4FsSh5Orr291XR2oPg7nfT_AZRqWiyhNkoBpzge36W8MJC_IDmEpM9UR-2ID5zwTfgO9x54Hor0iIvfB8j_PFx_813wRKMqCQSJd2UiiLqUE5MqEVFJgKHf"/></div><div><h4 class="font-label-md text-label-md text-on-surface">Sifat Ullah</h4><p class="font-body-sm text-body-sm text-on-surface-variant">Shared a Mentorship Success • 2h ago</p></div></div><p class="font-body-md text-body-md text-on-surface">Just finished a great 3-month mentorship cycle with Rahim. Seeing him land his first internship at TechCorp is what this community is all about! Proud of your progress.</p><div class="rounded-lg overflow-hidden h-48 bg-surface-container-high"><img alt="Mentorship meeting" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAsqvKg23brPOQYtxjqZUjLXdXTfHw0SvtuWiW6HJcjE_RNgRAr3Ep17snMjM1ugzU8jOqf5qerIt4ZrOFcZBxZNwTB0sPt-tNHxGincCPmZDqdzxijC-s3kDKoZbH-GMgwSG-xnDAMDUvO0WTYnPbvf5wGoVVuZPNY7BJSKb_w0qbD0EXKNt2KeJv85NJ5vd1rsr6OPPiKlTWin9JYOsWjPTdDcsFp3x14KBsM1XaWPa6hIdDFBEB-"/></div><div class="flex gap-stack-md border-t border-outline-variant pt-stack-sm"><button class="flex items-center gap-1 text-on-surface-variant hover:text-primary transition-colors font-label-sm text-label-sm"><span class="material-symbols-outlined text-sm">thumb_up</span> 24 Likes</button><button class="flex items-center gap-1 text-on-surface-variant hover:text-primary transition-colors font-label-sm text-label-sm"><span class="material-symbols-outlined text-sm">comment</span> 5 Comments</button></div></div></div></section><section class="bg-surface-container-lowest rounded-xl border border-outline-variant shadow-sm p-stack-lg">
+<div class="flex justify-between items-center mb-stack-md border-b border-outline-variant pb-stack-sm">
+<h2 class="font-headline-md text-headline-md text-on-surface flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">recent_actors</span>
+                            New Applications Pipeline
+                        </h2>
+</div>
+<div class="overflow-x-auto pb-4">
+<div class="flex gap-gutter min-w-max">
+<!-- Application Card 1 -->
+<div class="w-72 bg-surface border border-outline-variant rounded-lg p-stack-md shadow-sm hover:shadow-md transition-shadow relative flex flex-col">
+<div class="absolute top-0 right-0 m-3 bg-surface-tint/10 text-surface-tint px-2 py-1 rounded text-xs font-semibold">New</div>
+<div class="flex items-center gap-3 mb-4">
+<div class="w-10 h-10 rounded-full overflow-hidden bg-surface-container-high">
+<img class="w-full h-full object-cover" data-alt="Close up portrait of a young professional applicant. Clean, well-lit environment indicating a serious academic or early-career focus. Soft background blur emphasizes the subject. The overall tone is modern, corporate, and polished." src="https://lh3.googleusercontent.com/aida-public/AB6AXuB9mZc4e7LxHMU7I9PZA2Th-L1ZxCXL1v85RJWsec9KXdlKywS4ZFrMXVoedWZvJf8d3LOgzLJdorR98I6RrLtSICSNIlU1yrQnaNgdwBn27ZWjg-Vu1hCD6Kb90VfDsLvFnzh6mH_T6qLFhpwL9VfnSiK4AQC5vFUVd_hSg_E45x_lzghlFfdacMlaB9s0ACNlg3Z51H3YHyk9mlIE5ul0QCLcFMAzgsloHY8U2_fSVzeNeNneFh24"/>
+</div>
+<div>
+<h4 class="font-label-md text-label-md text-on-surface">Tariq Islam</h4>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Dhaka University</p>
+</div>
+</div>
+<div class="mb-4 flex-1">
+<p class="font-label-sm text-label-sm text-secondary mb-1">Applied for:</p>
+<p class="font-body-sm text-body-sm text-on-surface font-medium truncate">Junior Frontend Developer</p>
+</div>
+<div class="flex gap-2 mt-auto">
+<button class="flex-1 bg-surface border border-outline-variant text-on-surface py-2 rounded-lg font-label-sm text-label-sm hover:bg-surface-container-low transition-colors">Review</button>
+<button class="bg-primary-container text-on-primary-container p-2 rounded-lg hover:opacity-90 transition-opacity flex items-center justify-center">
+<span class="material-symbols-outlined text-sm" style="font-variation-settings: 'FILL' 1;">chat</span>
+</button>
+</div>
+</div>
+<!-- Application Card 2 -->
+<div class="w-72 bg-surface border border-outline-variant rounded-lg p-stack-md shadow-sm hover:shadow-md transition-shadow relative flex flex-col">
+<div class="flex items-center gap-3 mb-4">
+<div class="w-10 h-10 rounded-full overflow-hidden bg-surface-container-high">
+<img class="w-full h-full object-cover" data-alt="Portrait of an aspiring UX researcher student, presenting a confident yet approachable demeanor. The setting is a bright, modern interior with architectural elements softly out of focus in the background. The aesthetic reflects professional SaaS platform user profiles." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDasDzvHZ_W1M_R2KLNEfrkEd_Esr7kJVQfSC_H1M8QzrgqZmiMmb_gDQaoUNSqmYVyAOq77tQk1lsvI1a62ky0BRrNTWDs0KaPiKVr6ZEVwd0G-JDtw00a6Dup65DuUj4ykIWfsv8Ba4Hj1jUj9FOYCst9acaizk9atOUIVq0TqiMl_Hm0pTwPofLgYkYjIrttlCyq5wY_hRD2Luyk0ycUpaaySphtg-mIoG-U2EnsnuyCBYWP2Ofr"/>
+</div>
+<div>
+<h4 class="font-label-md text-label-md text-on-surface">Nadia Khan</h4>
+<p class="font-body-sm text-body-sm text-on-surface-variant">BRAC University</p>
+</div>
+</div>
+<div class="mb-4 flex-1">
+<p class="font-label-sm text-label-sm text-secondary mb-1">Applied for:</p>
+<p class="font-body-sm text-body-sm text-on-surface font-medium truncate">UX Research Intern</p>
+</div>
+<div class="flex gap-2 mt-auto">
+<button class="flex-1 bg-surface border border-outline-variant text-on-surface py-2 rounded-lg font-label-sm text-label-sm hover:bg-surface-container-low transition-colors">Review</button>
+<button class="bg-primary-container text-on-primary-container p-2 rounded-lg hover:opacity-90 transition-opacity flex items-center justify-center">
+<span class="material-symbols-outlined text-sm" style="font-variation-settings: 'FILL' 1;">chat</span>
+</button>
+</div>
+</div>
+<!-- View All Card -->
+<div class="w-48 bg-surface-container-low border border-dashed border-outline-variant rounded-lg p-stack-md flex flex-col items-center justify-center text-center hover:bg-surface-container transition-colors cursor-pointer group">
+<div class="w-12 h-12 rounded-full bg-surface flex items-center justify-center mb-2 group-hover:scale-110 transition-transform shadow-sm">
+<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 0;">arrow_forward</span>
+</div>
+<span class="font-label-md text-label-md text-secondary">View all 36 applications</span>
+</div>
+</div>
+</div>
+</section>
+</div>
+</main>
+</div>
+</body></html>

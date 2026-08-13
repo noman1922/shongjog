@@ -21,6 +21,10 @@ export default async function ProfilePage() {
     redirect("/onboarding");
   }
 
+  if (status.role === "admin") {
+    redirect("/admin");
+  }
+
   const profile = await getOwnProfile();
 
   if (!profile) {

@@ -29,12 +29,10 @@ const baseProfileSchema = z.object({
     .max(currentYear + 10, "Graduation year is too far in the future."),
   skillIds: z
     .array(uuidField)
-    .min(1, "Choose at least one skill.")
     .max(15, "Choose up to 15 skills."),
   bio: z
     .string()
     .trim()
-    .min(20, "Short bio must be at least 20 characters.")
     .max(500, "Short bio must be 500 characters or less."),
 });
 

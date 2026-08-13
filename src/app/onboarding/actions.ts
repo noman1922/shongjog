@@ -77,6 +77,15 @@ async function replaceUserSkills(
 ) {
   const uniqueSkillIds = Array.from(new Set(skillIds));
 
+  if (uniqueSkillIds.length === 0) {
+    const { error: deleteError } = await supabase
+      .from("user_skills")
+      .delete()
+      .eq("user_id", userId);
+
+    return deleteError ? "Could not update your skills." : null;
+  }
+
   const { data: existingSkills, error: skillsError } = await supabase
     .from("skills")
     .select("id")

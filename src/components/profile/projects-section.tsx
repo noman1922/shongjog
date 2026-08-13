@@ -1,4 +1,4 @@
-import { ExternalLink } from "lucide-react";
+import { Code2, ExternalLink, FolderKanban } from "lucide-react";
 
 import { ProfileCard } from "@/components/profile/profile-card";
 import { ProfileSection } from "@/components/profile/profile-section";
@@ -21,19 +21,27 @@ export function ProjectsSection({ projects }: { projects: ProfileProject[] }) {
                   />
                 ) : null}
                 <div className="space-y-2">
-                  <h3 className="break-words font-semibold">{project.title}</h3>
+                  <div className="flex items-start gap-3">
+                    <span className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-[#ECEEEB] text-[#0F5A47]">
+                      <FolderKanban aria-hidden="true" className="size-5" />
+                    </span>
+                    <h3 className="break-words font-semibold text-[#191C1B]">
+                      {project.title}
+                    </h3>
+                  </div>
                   {project.description ? (
-                    <p className="text-sm leading-6 text-muted-foreground">
+                    <p className="text-sm leading-6 text-[#3F4945]">
                       {project.description}
                     </p>
                   ) : null}
                   {project.projectUrl ? (
                     <a
-                      className="inline-flex min-h-10 items-center gap-1 text-sm font-medium text-foreground underline-offset-4 hover:underline"
+                      className="inline-flex min-h-10 items-center gap-1 rounded-lg border border-[#0F5A47] px-3 text-sm font-semibold text-[#0F5A47] underline-offset-4 hover:bg-[#0F5A47]/5"
                       href={project.projectUrl}
                       rel="noreferrer"
                       target="_blank"
                     >
+                      <Code2 className="size-4" aria-hidden="true" />
                       View project
                       <ExternalLink className="size-4" aria-hidden="true" />
                     </a>
@@ -44,7 +52,7 @@ export function ProjectsSection({ projects }: { projects: ProfileProject[] }) {
           ))}
         </div>
       ) : (
-        <p className="text-sm text-muted-foreground">No projects added yet.</p>
+        <p className="text-sm text-[#747875]">No projects added yet.</p>
       )}
     </ProfileSection>
   );

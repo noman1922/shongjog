@@ -1,84 +1,108 @@
-import { GraduationCap, LogIn, UserPlus } from "lucide-react";
+import { AuthEntryPanel } from "@/components/landing/auth-entry-panel";
 
-import { signInWithGoogle } from "@/app/login/actions";
-import { Button } from "@/components/ui/button";
+function friendlyPageError(error: string) {
+  const messages: Record<string, string> = {
+    auth_callback: "Authentication could not be completed. Please try again.",
+    missing_origin: "Authentication could not start from this page. Please try again.",
+    oauth_start_failed: "Google sign-in could not start. Please try again.",
+  };
 
-function BrandMark() {
-  return (
-    <div className="flex items-center gap-2">
-      <span className="flex size-9 items-center justify-center rounded-lg bg-primary text-primary-foreground">
-        <GraduationCap aria-hidden="true" className="size-5" />
-      </span>
-      <span className="text-lg font-semibold tracking-tight">Shongjog</span>
-    </div>
-  );
+  return messages[error] ?? error;
 }
 
-export function LandingPage() {
-  return (
-    <main className="min-h-dvh overflow-x-hidden bg-muted/30 px-4 py-5 text-foreground sm:px-6 sm:py-8 lg:py-10">
-      <div className="mx-auto flex min-h-[calc(100dvh-2.5rem)] w-full max-w-5xl flex-col">
-        <header className="py-3">
-          <BrandMark />
-        </header>
+function statusMessage(error?: string, signup?: string) {
+  if (error) {
+    return {
+      className: "border-red-200 bg-red-50 text-red-700",
+      text: friendlyPageError(error),
+    };
+  }
 
-        <section className="grid flex-1 items-center gap-8 py-8 lg:grid-cols-[minmax(0,1fr)_26rem] lg:py-12">
-          <div className="space-y-4">
-            <p className="text-sm font-medium text-muted-foreground">
-              University student and alumni networking
+  if (signup === "check_email") {
+    return {
+      className: "border-[#14B8A6]/30 bg-[#14B8A6]/10 text-[#0F5A47]",
+      text: "Check your email to confirm your account, then return to Shongjog to continue onboarding.",
+    };
+  }
+
+  return null;
+}
+
+export function LandingPage({
+  error,
+  signup,
+}: {
+  error?: string;
+  signup?: string;
+}) {
+  const message = statusMessage(error, signup);
+
+  return (
+    <main className="min-h-dvh overflow-x-hidden bg-[#F8FAF7] px-4 py-6 text-[#191C1B] sm:px-6 lg:px-8">
+      <div className="mx-auto grid min-h-[calc(100dvh-3rem)] w-full max-w-6xl items-center gap-8 lg:grid-cols-[0.95fr_1.05fr]">
+        <section className="mx-auto w-full max-w-xl lg:mx-0">
+          <div className="flex items-center gap-3">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              alt="Shongjog logo"
+              className="size-14 shrink-0 object-contain sm:size-16"
+              src="/brand/logo.png"
+            />
+            <div className="min-w-0">
+              <p className="text-2xl font-bold tracking-tight text-[#0F5A47] sm:text-3xl">
+                Shongjog
+              </p>
+              <p className="text-sm font-medium text-[#747875]">
+                Student and alumni network
+              </p>
+            </div>
+          </div>
+
+          <div className="mt-8">
+            <p className="text-sm font-bold uppercase tracking-wide text-[#14B8A6]">
+              University circles, built for Bangladesh
             </p>
-            <h1 className="text-3xl font-semibold tracking-tight sm:text-4xl lg:text-5xl">
+            <h1 className="mt-3 text-3xl font-bold tracking-tight text-[#191C1B] sm:text-4xl lg:text-5xl">
               Welcome to Shongjog
             </h1>
-            <p className="max-w-2xl text-base leading-7 text-muted-foreground sm:text-lg">
-              Connect with students and alumni from your university, discover
-              skills and projects, and find opportunities through an academic
-              community built around shared roots.
+            <p className="mt-4 max-w-lg text-base leading-7 text-[#3F4945] sm:text-lg">
+              Connect with students and alumni, discover opportunities, and grow
+              through trusted academic communities.
             </p>
           </div>
 
-          <div className="grid gap-4">
-            <section className="rounded-lg border border-border bg-background p-5 shadow-sm">
-              <div className="space-y-2">
-                <h2 className="text-xl font-semibold tracking-tight">Log in</h2>
-                <p className="text-sm leading-6 text-muted-foreground">
-                  Continue with the Google account already connected to
-                  Shongjog.
+          <div className="mt-8 grid gap-3 sm:grid-cols-3">
+            {["Connect", "Discover", "Opportunities"].map((item) => (
+              <div
+                className="rounded-xl border border-[#BFC9C3] bg-white/80 p-4 shadow-[0_8px_24px_rgba(30,41,59,0.04)]"
+                key={item}
+              >
+                <p className="text-sm font-bold text-[#0F5A47]">{item}</p>
+                <p className="mt-2 text-xs leading-5 text-[#3F4945]">
+                  {item === "Connect"
+                    ? "Build your student-alumni circle."
+                    : item === "Discover"
+                      ? "Find people, projects, and skills."
+                      : "Explore roles, internships, and guidance."}
                 </p>
               </div>
-              <form action={signInWithGoogle} className="mt-5">
-                <input name="next" type="hidden" value="/profile" />
-                <Button className="h-11 w-full" size="lg" type="submit">
-                  <LogIn aria-hidden="true" />
-                  Log in with Google
-                </Button>
-              </form>
-            </section>
-
-            <section className="rounded-lg border border-border bg-background p-5 shadow-sm">
-              <div className="space-y-2">
-                <h2 className="text-xl font-semibold tracking-tight">
-                  Create account
-                </h2>
-                <p className="text-sm leading-6 text-muted-foreground">
-                  Start with Google. New members will complete a short student
-                  or alumni onboarding profile.
-                </p>
-              </div>
-              <form action={signInWithGoogle} className="mt-5">
-                <input name="next" type="hidden" value="/profile" />
-                <Button
-                  className="h-11 w-full"
-                  size="lg"
-                  type="submit"
-                  variant="outline"
-                >
-                  <UserPlus aria-hidden="true" />
-                  Create account with Google
-                </Button>
-              </form>
-            </section>
+            ))}
           </div>
+        </section>
+
+        <section className="mx-auto w-full max-w-md lg:max-w-lg">
+          {message ? (
+            <p
+              className={`mb-4 rounded-xl border px-4 py-3 text-sm leading-6 ${message.className}`}
+            >
+              {message.text}
+            </p>
+          ) : null}
+          <AuthEntryPanel />
+          <p className="mt-4 text-center text-xs leading-5 text-[#747875]">
+            Email and Google both use Supabase Auth. You will complete your
+            Student or Alumni profile after account access is confirmed.
+          </p>
         </section>
       </div>
     </main>

@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Alumni Talent Discovery - Shongjog</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Plus+Jakarta+Sans:wght@600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "inverse-surface": "#2e312f",
+                      "on-tertiary": "#ffffff",
+                      "surface-container-low": "#f2f4f1",
+                      "on-tertiary-container": "#49d6c3",
+                      "tertiary-fixed-dim": "#4fdbc8",
+                      "on-error": "#ffffff",
+                      "on-primary-fixed-variant": "#00513f",
+                      "outline-variant": "#bfc9c3",
+                      "tertiary-container": "#005a50",
+                      "inverse-primary": "#90d4bc",
+                      "error": "#ba1a1a",
+                      "on-surface": "#191c1b",
+                      "on-tertiary-fixed-variant": "#005048",
+                      "on-error-container": "#93000a",
+                      "on-secondary-fixed-variant": "#3c475a",
+                      "inverse-on-surface": "#eff1ee",
+                      "on-secondary-container": "#586377",
+                      "surface-tint": "#256956",
+                      "surface-variant": "#e1e3e0",
+                      "primary": "#004132",
+                      "on-primary-container": "#8ccfb7",
+                      "on-secondary": "#ffffff",
+                      "surface-container-lowest": "#ffffff",
+                      "error-container": "#ffdad6",
+                      "primary-fixed-dim": "#90d4bc",
+                      "secondary": "#545f73",
+                      "on-tertiary-fixed": "#00201c",
+                      "on-secondary-fixed": "#111c2d",
+                      "surface-dim": "#d8dbd7",
+                      "outline": "#6f7974",
+                      "background": "#f8faf7",
+                      "surface": "#f8faf7",
+                      "primary-fixed": "#acf1d7",
+                      "surface-bright": "#f8faf7",
+                      "primary-container": "#0f5a47",
+                      "surface-container": "#eceeeb",
+                      "secondary-fixed-dim": "#bcc7de",
+                      "tertiary-fixed": "#71f8e4",
+                      "on-surface-variant": "#3f4945",
+                      "surface-container-highest": "#e1e3e0",
+                      "secondary-container": "#d5e0f8",
+                      "surface-container-high": "#e6e9e5",
+                      "tertiary": "#004139",
+                      "secondary-fixed": "#d8e3fb",
+                      "on-primary-fixed": "#002118",
+                      "on-primary": "#ffffff",
+                      "on-background": "#191c1b"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "gutter": "24px",
+                      "margin-desktop": "32px",
+                      "base": "4px",
+                      "stack-md": "16px",
+                      "stack-sm": "8px",
+                      "container-max": "1280px",
+                      "stack-lg": "24px",
+                      "margin-mobile": "16px"
+              },
+              "fontFamily": {
+                      "body-lg": [
+                              "Inter"
+                      ],
+                      "headline-lg": [
+                              "Plus Jakarta Sans"
+                      ],
+                      "display-lg": [
+                              "Plus Jakarta Sans"
+                      ],
+                      "label-sm": [
+                              "Inter"
+                      ],
+                      "label-md": [
+                              "Inter"
+                      ],
+                      "headline-lg-mobile": [
+                              "Plus Jakarta Sans"
+                      ],
+                      "body-md": [
+                              "Inter"
+                      ],
+                      "body-sm": [
+                              "Inter"
+                      ],
+                      "headline-md": [
+                              "Plus Jakarta Sans"
+                      ]
+              },
+              "fontSize": {
+                      "body-lg": [
+                              "18px",
+                              {
+                                      "lineHeight": "28px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "headline-lg": [
+                              "32px",
+                              {
+                                      "lineHeight": "40px",
+                                      "letterSpacing": "-0.01em",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "display-lg": [
+                              "48px",
+                              {
+                                      "lineHeight": "60px",
+                                      "letterSpacing": "-0.02em",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "label-sm": [
+                              "12px",
+                              {
+                                      "lineHeight": "16px",
+                                      "fontWeight": "500"
+                              }
+                      ],
+                      "label-md": [
+                              "14px",
+                              {
+                                      "lineHeight": "20px",
+                                      "letterSpacing": "0.05em",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "headline-lg-mobile": [
+                              "28px",
+                              {
+                                      "lineHeight": "36px",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "body-md": [
+                              "16px",
+                              {
+                                      "lineHeight": "24px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "body-sm": [
+                              "14px",
+                              {
+                                      "lineHeight": "20px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "headline-md": [
+                              "24px",
+                              {
+                                      "lineHeight": "32px",
+                                      "fontWeight": "600"
+                              }
+                      ]
+              }
+      },
+          },
+        }
+      </script>
+<style>
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(226, 232, 240, 0.8);
+            box-shadow: 0 4px 6px -1px rgba(30, 41, 59, 0.05), 0 2px 4px -2px rgba(30, 41, 59, 0.05);
+        }
+        
+        .card-hover {
+            transition: all 0.2s ease-in-out;
+        }
+        
+        .card-hover:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(30, 41, 59, 0.08), 0 4px 6px -4px rgba(30, 41, 59, 0.08);
+        }
+
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background-color: #cbd5e1;
+            border-radius: 20px;
+        }
+      </style>
+</head>
+<body class="bg-surface text-on-surface font-body-md h-screen flex overflow-hidden">
+<!-- Top Navigation Container (Shell) -->
+<div class="fixed top-0 w-full z-50 flex justify-between items-center px-gutter h-16 bg-surface border-b border-outline-variant shadow-sm hidden md:flex">
+<!-- Brand/Logo -->
+<div class="flex items-center gap-4">
+<span class="font-display-lg text-headline-md font-bold text-primary tracking-tight">Shongjog</span>
+<span class="font-label-sm text-label-sm bg-surface-container-high text-on-surface-variant px-2 py-1 rounded-full">[Alumni View]</span>
+</div>
+<!-- Desktop Links -->
+<nav class="flex gap-6">
+<a class="text-on-surface-variant font-medium hover:text-primary transition-colors flex items-center gap-1" href="#">Network</a>
+<a class="text-primary border-b-2 border-primary pb-1 font-bold flex items-center gap-1" href="#">Opportunities</a>
+<a class="text-on-surface-variant font-medium hover:text-primary transition-colors flex items-center gap-1" href="#">Discussions</a>
+</nav>
+<!-- Actions -->
+<div class="flex items-center gap-4">
+<button class="p-2 text-on-surface-variant hover:text-primary transition-colors rounded-full hover:bg-surface-container">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button class="p-2 text-on-surface-variant hover:text-primary transition-colors rounded-full hover:bg-surface-container">
+<span class="material-symbols-outlined">account_circle</span>
+</button>
+<button class="bg-primary text-on-primary font-label-md text-label-md px-4 py-2 rounded-lg hover:bg-primary-container hover:text-on-primary-container transition-all shadow-sm">
+                [Post New Opportunity]
+            </button>
+</div>
+</div>
+<!-- SideNavBar (Desktop Shell) -->
+<div class="hidden lg:flex flex-col fixed left-0 top-16 bottom-0 w-64 p-stack-md bg-surface border-r border-outline-variant overflow-y-auto custom-scrollbar z-40">
+<!-- Search & Filter Header -->
+<div class="mb-stack-lg">
+<h2 class="font-headline-sm text-headline-md text-primary font-bold mb-stack-sm">Discover Talent</h2>
+<div class="relative">
+<span class="material-symbols-outlined absolute left-3 top-2.5 text-on-surface-variant text-sm">search</span>
+<input class="w-full pl-9 pr-3 py-2 bg-surface-container-lowest border border-outline-variant rounded-lg text-body-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/20 transition-all" placeholder="Search skills, names..." type="text"/>
+</div>
+</div>
+<!-- Filters -->
+<div class="flex-1 space-y-stack-md">
+<!-- Skill Filter -->
+<div>
+<h3 class="font-label-md text-label-md text-on-surface-variant mb-stack-sm uppercase tracking-wider text-xs">Skills</h3>
+<div class="space-y-2">
+<label class="flex items-center gap-2 cursor-pointer group">
+<input class="rounded border-outline-variant text-primary focus:ring-primary/20 w-4 h-4" type="checkbox"/>
+<span class="text-body-sm text-on-surface group-hover:text-primary transition-colors">C#</span>
+</label>
+<label class="flex items-center gap-2 cursor-pointer group">
+<input class="rounded border-outline-variant text-primary focus:ring-primary/20 w-4 h-4" type="checkbox"/>
+<span class="text-body-sm text-on-surface group-hover:text-primary transition-colors">Automation</span>
+</label>
+<label class="flex items-center gap-2 cursor-pointer group">
+<input class="rounded border-outline-variant text-primary focus:ring-primary/20 w-4 h-4" type="checkbox"/>
+<span class="text-body-sm text-on-surface group-hover:text-primary transition-colors">React</span>
+</label>
+<button class="text-primary font-label-sm text-label-sm hover:underline mt-1">Show more</button>
+</div>
+</div>
+<!-- University Filter -->
+<div>
+<h3 class="font-label-md text-label-md text-on-surface-variant mb-stack-sm uppercase tracking-wider text-xs">University</h3>
+<div class="space-y-2">
+<label class="flex items-center gap-2 cursor-pointer group">
+<input checked="" class="rounded border-outline-variant text-primary focus:ring-primary/20 w-4 h-4" type="checkbox"/>
+<span class="text-body-sm text-on-surface group-hover:text-primary transition-colors">BRAC University</span>
+</label>
+<label class="flex items-center gap-2 cursor-pointer group">
+<input class="rounded border-outline-variant text-primary focus:ring-primary/20 w-4 h-4" type="checkbox"/>
+<span class="text-body-sm text-on-surface group-hover:text-primary transition-colors">University of Dhaka</span>
+</label>
+</div>
+</div>
+<div class="pt-stack-sm border-t border-outline-variant">
+<label class="flex items-center justify-between cursor-pointer group">
+<span class="font-label-sm text-label-md text-on-surface font-medium">[Only Show Available Interns]</span>
+<div class="relative">
+<input class="sr-only peer" type="checkbox"/>
+<div class="w-9 h-5 bg-surface-variant peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-primary"></div>
+</div>
+</label>
+</div>
+</div>
+</div>
+<!-- Main Content Canvas -->
+<main class="flex-1 w-full lg:ml-64 mt-16 p-gutter md:p-margin-desktop overflow-y-auto bg-[#F8FAFC]">
+<div class="max-w-container-max mx-auto">
+<!-- Header section for main content -->
+<div class="flex justify-between items-end mb-stack-lg border-b border-outline-variant pb-stack-sm">
+<div>
+<h1 class="font-headline-lg text-headline-lg text-primary">Student Candidate Grid</h1>
+<p class="font-body-md text-body-md text-on-surface-variant mt-1">Discover top talent from trusted academic networks.</p>
+</div>
+<div class="hidden md:flex gap-2">
+<button class="px-3 py-1.5 border border-outline-variant rounded-lg text-label-sm font-label-sm text-on-surface hover:bg-surface-container transition-colors flex items-center gap-1">
+<span class="material-symbols-outlined text-sm">sort</span> Sort by: Match
+                     </button>
+</div>
+</div>
+<!-- Student Grid - Bento Style -->
+<div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-gutter">
+<!-- Card 1 -->
+<div class="glass-panel rounded-xl p-stack-lg card-hover relative overflow-hidden flex flex-col h-full bg-white">
+<!-- Featured Accent Bar -->
+<div class="absolute left-0 top-0 bottom-0 w-1 bg-amber-400"></div>
+<div class="flex items-start gap-4 mb-stack-md">
+<div class="relative">
+<img class="w-12 h-12 rounded-full object-cover border border-outline-variant shadow-sm" data-alt="A professional headshot of a young South Asian female computer science student. Bright, natural lighting, modern university campus background, slightly blurred out. Clean, optimistic, approachable corporate aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAVg3w7lIxtPDJoq5bwnIe0Recz3mzvARkDI3DEDBu9hmNKooK8HwptB_RP8CvoPXXzenE3tu6AojfIj7rprh9EGjWH_LQVpjEAaH2Zxc7B6U_iw5gevF7vVXl7nHN0bRko1P3IB4Lg_w08ehEJKC1D1gCnFT_JOsAF72BYZ8J2SHW9NvEY4C6yIQ280CQmM9-Yvbyf2VGiRvBXlvoMH2x7-zEUgnq0O3ChkoawpnfjOanLbbxg1ui8"/>
+<div class="absolute bottom-0 right-0 w-3 h-3 bg-emerald-500 border-2 border-white rounded-full"></div>
+</div>
+<div class="flex-1">
+<h3 class="font-headline-md text-headline-sm font-semibold text-on-surface line-clamp-1">Nafisa Rahman</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant line-clamp-1">Computer Science, Senior</p>
+<p class="font-label-sm text-label-sm text-primary mt-0.5 flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">school</span> BRAC University
+                             </p>
+</div>
+</div>
+<div class="flex-1">
+<div class="mb-stack-sm">
+<p class="font-label-sm text-label-sm text-on-surface-variant mb-1 uppercase tracking-wider text-[10px]">Top Projects</p>
+<div class="flex flex-wrap gap-2">
+<span class="bg-[#F1F5F9] text-[#1e293b] px-2.5 py-1 rounded-full font-label-sm text-label-sm border border-outline-variant/30">FinTech App</span>
+<span class="bg-[#F1F5F9] text-[#1e293b] px-2.5 py-1 rounded-full font-label-sm text-label-sm border border-outline-variant/30">E-commerce</span>
+</div>
+</div>
+<div>
+<p class="font-label-sm text-label-sm text-on-surface-variant mb-1 uppercase tracking-wider text-[10px]">Core Skills</p>
+<div class="flex flex-wrap gap-1">
+<span class="text-body-sm text-on-surface">C#</span><span class="text-outline-variant px-1">•</span>
+<span class="text-body-sm text-on-surface">.NET Core</span><span class="text-outline-variant px-1">•</span>
+<span class="text-body-sm text-on-surface">React</span>
+</div>
+</div>
+</div>
+<div class="mt-stack-lg pt-stack-sm border-t border-outline-variant flex items-center justify-between">
+<a class="text-on-surface-variant hover:text-primary transition-colors flex items-center gap-1 font-label-sm text-label-sm" href="#">
+<span class="material-symbols-outlined text-sm">code</span> GitHub
+                         </a>
+<div class="flex gap-2">
+<button class="bg-white border border-[#1e293b] text-[#1e293b] px-3 py-1.5 rounded-lg font-label-sm text-label-sm hover:bg-surface-container transition-colors">
+                                 [View Profile]
+                             </button>
+<button class="bg-primary text-white px-3 py-1.5 rounded-lg font-label-sm text-label-sm hover:bg-primary-container transition-colors shadow-sm flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px]">person_add</span> [Send Connection]
+                             </button>
+</div>
+</div>
+</div>
+<!-- Card 2 (Standard, no featured bar) -->
+<div class="glass-panel rounded-xl p-stack-lg card-hover relative overflow-hidden flex flex-col h-full bg-white">
+<div class="flex items-start gap-4 mb-stack-md">
+<div class="relative">
+<img class="w-12 h-12 rounded-full object-cover border border-outline-variant shadow-sm" data-alt="A professional headshot of a young South Asian male engineering student. Studio lighting, plain light grey background. Clean, focused, academic yet ready for corporate world aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuC8iWSniLHAl7OMh-Y9eiE2ayC5KhvOecNkJu3iF6CbJ6Ti3eiU-FJGY4ZMhsRFILxxKqts_Lzj3YwN0U5ZIq0fdPH48MgNfGty-KSU-lzRUSfRGi70_7yXAFuu0DMiiHhkHBeZmU-OVyzq98F0fv1oIeg9-EzFf_O7ag8YjoAOJO4CsWXECLXnrwtaQ_nxrcWZCn_LeL4Ue2Gp5yo2O1GvJ2nFlxYJnsAPATecuXG8Ecc9f08QrGDn"/>
+</div>
+<div class="flex-1">
+<h3 class="font-headline-md text-headline-sm font-semibold text-on-surface line-clamp-1">Fahim Ahmed</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant line-clamp-1">Software Engineering, Junior</p>
+<p class="font-label-sm text-label-sm text-primary mt-0.5 flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">school</span> University of Dhaka
+                             </p>
+</div>
+</div>
+<div class="flex-1">
+<div class="mb-stack-sm">
+<p class="font-label-sm text-label-sm text-on-surface-variant mb-1 uppercase tracking-wider text-[10px]">Top Projects</p>
+<div class="flex flex-wrap gap-2">
+<span class="bg-[#F1F5F9] text-[#1e293b] px-2.5 py-1 rounded-full font-label-sm text-label-sm border border-outline-variant/30">QA Automation</span>
+<span class="bg-[#F1F5F9] text-[#1e293b] px-2.5 py-1 rounded-full font-label-sm text-label-sm border border-outline-variant/30">Testing Suite</span>
+</div>
+</div>
+<div>
+<p class="font-label-sm text-label-sm text-on-surface-variant mb-1 uppercase tracking-wider text-[10px]">Core Skills</p>
+<div class="flex flex-wrap gap-1">
+<span class="text-body-sm text-on-surface">Automation</span><span class="text-outline-variant px-1">•</span>
+<span class="text-body-sm text-on-surface">Selenium</span><span class="text-outline-variant px-1">•</span>
+<span class="text-body-sm text-on-surface">Java</span>
+</div>
+</div>
+</div>
+<div class="mt-stack-lg pt-stack-sm border-t border-outline-variant flex items-center justify-between">
+<a class="text-on-surface-variant hover:text-primary transition-colors flex items-center gap-1 font-label-sm text-label-sm" href="#">
+<span class="material-symbols-outlined text-sm">code</span> GitHub
+                         </a>
+<div class="flex gap-2">
+<button class="bg-white border border-[#1e293b] text-[#1e293b] px-3 py-1.5 rounded-lg font-label-sm text-label-sm hover:bg-surface-container transition-colors">
+                                 [View Profile]
+                             </button>
+<button class="bg-primary text-white px-3 py-1.5 rounded-lg font-label-sm text-label-sm hover:bg-primary-container transition-colors shadow-sm flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px]">person_add</span> [Send Connection]
+                             </button>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+</body></html>

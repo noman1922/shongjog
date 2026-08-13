@@ -8,7 +8,7 @@ export function SkillsSection({ skills }: { skills: ProfileSkill[] }) {
         <div className="flex flex-wrap gap-2">
           {skills.map((skill) => (
             <span
-              className="rounded-md border border-border bg-muted px-2.5 py-1 text-sm"
+              className="rounded-full border border-[#BFC9C3]/70 bg-[#F1F5F9] px-3 py-1.5 text-sm font-medium text-[#1E293B]"
               key={skill.id}
             >
               {skill.name}
@@ -16,7 +16,7 @@ export function SkillsSection({ skills }: { skills: ProfileSkill[] }) {
           ))}
         </div>
       ) : (
-        <p className="text-sm text-muted-foreground">No skills added yet.</p>
+        <p className="text-sm text-[#747875]">No skills added yet.</p>
       )}
     </ProfileSection>
   );

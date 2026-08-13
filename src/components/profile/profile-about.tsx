@@ -1,4 +1,10 @@
-import { BriefcaseBusiness, CalendarDays, GraduationCap } from "lucide-react";
+import {
+  BriefcaseBusiness,
+  Building2,
+  CalendarDays,
+  GraduationCap,
+  School,
+} from "lucide-react";
 
 import { ProfileSection } from "@/components/profile/profile-section";
 import type { PublicProfile } from "@/lib/profile/types";
@@ -15,9 +21,11 @@ function DetailItem({
   }
 
   return (
-    <div className="space-y-1">
-      <p className="text-xs font-medium uppercase text-muted-foreground">{label}</p>
-      <p className="text-sm leading-6">{value}</p>
+    <div className="space-y-1 rounded-lg border border-[#BFC9C3]/50 bg-[#F8FAF7] p-3">
+      <p className="text-xs font-semibold uppercase tracking-wide text-[#747875]">
+        {label}
+      </p>
+      <p className="text-sm leading-6 text-[#191C1B]">{value}</p>
     </div>
   );
 }
@@ -26,7 +34,7 @@ export function ProfileAbout({ profile }: { profile: PublicProfile }) {
   return (
     <ProfileSection title="About">
       <div className="space-y-5">
-        <p className="text-sm leading-6 text-muted-foreground">
+        <p className="text-sm leading-6 text-[#3F4945]">
           {profile.bio || "No bio added yet."}
         </p>
 
@@ -47,11 +55,14 @@ export function ProfileAbout({ profile }: { profile: PublicProfile }) {
           {profile.details.role === "student" ? (
             <>
               <div className="space-y-1">
-                <p className="text-xs font-medium uppercase text-muted-foreground">
+                <p className="text-xs font-semibold uppercase tracking-wide text-[#747875]">
                   Internship availability
                 </p>
-                <p className="flex items-center gap-2 text-sm leading-6">
-                  <GraduationCap className="size-4" aria-hidden="true" />
+                <p className="flex items-center gap-2 text-sm leading-6 text-[#191C1B]">
+                  <GraduationCap
+                    className="size-4 text-[#0F5A47]"
+                    aria-hidden="true"
+                  />
                   {profile.details.internshipAvailable ? "Available" : "Not available"}
                 </p>
               </div>
@@ -69,11 +80,14 @@ export function ProfileAbout({ profile }: { profile: PublicProfile }) {
                 value={profile.details.professionalField}
               />
               <div className="space-y-1">
-                <p className="text-xs font-medium uppercase text-muted-foreground">
+                <p className="text-xs font-semibold uppercase tracking-wide text-[#747875]">
                   Years of experience
                 </p>
-                <p className="flex items-center gap-2 text-sm leading-6">
-                  <BriefcaseBusiness className="size-4" aria-hidden="true" />
+                <p className="flex items-center gap-2 text-sm leading-6 text-[#191C1B]">
+                  <BriefcaseBusiness
+                    className="size-4 text-[#0F5A47]"
+                    aria-hidden="true"
+                  />
                   {profile.details.experienceYears ?? 0}
                 </p>
               </div>
@@ -81,12 +95,25 @@ export function ProfileAbout({ profile }: { profile: PublicProfile }) {
           )}
 
           <div className="space-y-1">
-            <p className="text-xs font-medium uppercase text-muted-foreground">
+            <p className="text-xs font-semibold uppercase tracking-wide text-[#747875]">
               Member type
             </p>
-            <p className="flex items-center gap-2 text-sm capitalize leading-6">
-              <CalendarDays className="size-4" aria-hidden="true" />
+            <p className="flex items-center gap-2 text-sm capitalize leading-6 text-[#191C1B]">
+              {profile.details.role === "student" ? (
+                <School className="size-4 text-[#0F5A47]" aria-hidden="true" />
+              ) : (
+                <Building2 className="size-4 text-[#0F5A47]" aria-hidden="true" />
+              )}
               {profile.details.role}
+            </p>
+          </div>
+          <div className="space-y-1 rounded-lg border border-[#BFC9C3]/50 bg-[#F8FAF7] p-3">
+            <p className="text-xs font-semibold uppercase tracking-wide text-[#747875]">
+              Graduation
+            </p>
+            <p className="flex items-center gap-2 text-sm leading-6 text-[#191C1B]">
+              <CalendarDays className="size-4 text-[#0F5A47]" aria-hidden="true" />
+              {profile.details.graduationYear ?? "Not set"}
             </p>
           </div>
         </div>
