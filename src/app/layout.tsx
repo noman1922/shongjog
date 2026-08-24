@@ -16,17 +16,13 @@ export const metadata: Metadata = {
   description:
     "Premier university student and alumni networking platform in Bangladesh. Connect, collaborate, and discover opportunities.",
   icons: {
-    apple: [
-      { type: "image/svg+xml", url: "/icon.svg" },
-      { type: "image/png", url: "/apple-icon.png" },
-      { type: "image/png", url: "/icon.png" },
-    ],
+    apple: "/icon.svg?v=3",
     icon: [
-      { type: "image/svg+xml", url: "/icon.svg" },
+      { type: "image/svg+xml", url: "/icon.svg?v=3" },
       { type: "image/png", url: "/icon.png" },
       { type: "image/png", url: "/brand/icon.png" },
     ],
-    shortcut: "/icon.svg",
+    shortcut: "/icon.svg?v=3",
   },
   title: "Shongjog | University Student & Alumni Network",
 };
@@ -43,6 +39,7 @@ export default function RootLayout({
       suppressHydrationWarning
     >
       <head>
+        <link href="/icon.svg?v=3" rel="icon" type="image/svg+xml" />
         <script
           dangerouslySetInnerHTML={{
             __html: `(function(){try{var t=localStorage.getItem('shongjog-theme');if(t==='dark'||(!t&&window.matchMedia('(prefers-color-scheme: dark)').matches)){document.documentElement.classList.add('dark');}}catch(e){}})();`,

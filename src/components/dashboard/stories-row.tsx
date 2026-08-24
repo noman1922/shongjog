@@ -195,8 +195,8 @@ export function StoriesRow({
   useEffect(() => {
     let cached: StoryItem[] = [];
     try {
-      const raw = localStorage.getItem(LOCAL_STORAGE_STORIES_KEY);
-      if (raw) {
+      const raw = typeof window !== "undefined" ? localStorage.getItem(LOCAL_STORAGE_STORIES_KEY) : null;
+      if (raw && raw.trim() !== "") {
         const parsed = JSON.parse(raw);
         if (Array.isArray(parsed)) {
           cached = parsed;
@@ -338,12 +338,20 @@ export function StoriesRow({
 
     // 2. Persist to localStorage backup
     try {
-      const raw = localStorage.getItem(LOCAL_STORAGE_STORIES_KEY);
-      const existing: StoryItem[] = raw ? JSON.parse(raw) : [];
-      localStorage.setItem(
-        LOCAL_STORAGE_STORIES_KEY,
-        JSON.stringify([customStory, ...existing].slice(0, 20))
-      );
+      if (typeof window !== "undefined") {
+        const raw = localStorage.getItem(LOCAL_STORAGE_STORIES_KEY);
+        let existing: StoryItem[] = [];
+        if (raw && raw.trim() !== "") {
+          try {
+            const parsed = JSON.parse(raw);
+            if (Array.isArray(parsed)) existing = parsed;
+          } catch {}
+        }
+        localStorage.setItem(
+          LOCAL_STORAGE_STORIES_KEY,
+          JSON.stringify([customStory, ...existing].slice(0, 20))
+        );
+      }
     } catch (err) {
       console.warn("Could not save story to localStorage:", err);
     }
