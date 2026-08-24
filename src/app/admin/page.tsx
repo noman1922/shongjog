@@ -1,27 +1,31 @@
-import { redirect } from "next/navigation";
-
 import { AdminDashboard } from "@/components/admin/admin-dashboard";
-import { getAdminDashboardData, getCurrentAdminUser } from "@/lib/admin/data";
-import { createClient } from "@/lib/supabase/server";
+import {
+  getAdminDashboardData,
+  getAdminPostsList,
+  getAdminStoriesList,
+  getAdminUsersList,
+} from "@/lib/admin/data";
+import { requireAdminUser } from "@/lib/admin/permissions";
 
 export default async function AdminPage() {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  // 1. Enforce Server-Side Admin Role Verification
+  const admin = await requireAdminUser();
 
-  if (!user) {
-    redirect("/admin/login");
-  }
+  // 2. Fetch Live Dashboard Data, User Directory, Posts, and Stories in Parallel
+  const [data, users, posts, stories] = await Promise.all([
+    getAdminDashboardData(),
+    getAdminUsersList(),
+    getAdminPostsList(),
+    getAdminStoriesList(),
+  ]);
 
-  const admin = await getCurrentAdminUser();
-
-  if (!admin) {
-    redirect("/admin/login?error=forbidden");
-  }
-
-  const data = await getAdminDashboardData();
-
-  return <AdminDashboard adminName={admin.fullName} data={data} />;
+  return (
+    <AdminDashboard
+      admin={admin}
+      data={data}
+      posts={posts}
+      stories={stories}
+      users={users}
+    />
+  );
 }
-

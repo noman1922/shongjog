@@ -1,6 +1,7 @@
-import { LockKeyhole, ShieldAlert, ShieldCheck } from "lucide-react";
+import { LockKeyhole, Mail, ShieldAlert, ShieldCheck } from "lucide-react";
 
-import { signInWithGoogle } from "@/app/login/actions";
+import { signInAdminWithEmail } from "@/app/admin/login/actions";
+import { ShongjogBrand } from "@/components/shongjog/brand";
 import { Button } from "@/components/ui/button";
 
 export function AdminLoginPage({ error }: { error?: string }) {
@@ -12,13 +13,12 @@ export function AdminLoginPage({ error }: { error?: string }) {
           className="absolute right-5 top-5 size-16 text-blue-500/10"
         />
         <div className="relative z-10 text-center">
-          <div className="mx-auto mb-5 flex size-16 items-center justify-center rounded-full border border-slate-600 bg-slate-800 text-blue-400">
-            <LockKeyhole aria-hidden="true" className="size-7" />
+          <div className="mx-auto mb-4 flex justify-center">
+            <ShongjogBrand href="/admin/login" inverted variant="admin" />
           </div>
-          <h1 className="text-3xl font-bold text-white">System Admin</h1>
-          <p className="mt-3 text-sm leading-6 text-slate-400">
-            Restricted area. Sign in with your authorized Shongjog admin Google
-            account.
+          <h1 className="text-2xl sm:text-3xl font-bold text-white mt-2">Administrative Console</h1>
+          <p className="mt-2 text-xs sm:text-sm leading-relaxed text-slate-400">
+            Restricted area. Sign in with your authorized Shongjog admin credentials.
           </p>
         </div>
 
@@ -28,15 +28,55 @@ export function AdminLoginPage({ error }: { error?: string }) {
           </div>
         ) : null}
 
-        <form action={signInWithGoogle} className="relative z-10 mt-6">
-          <input name="next" type="hidden" value="/admin" />
+        <form action={signInAdminWithEmail} className="relative z-10 mt-6 space-y-4">
+          <div className="space-y-1.5">
+            <label className="text-xs font-semibold text-slate-300" htmlFor="admin-email">
+              Admin Email
+            </label>
+            <div className="relative">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
+                <Mail className="size-4" />
+              </div>
+              <input
+                autoComplete="email"
+                className="block w-full pl-10 pr-4 py-2.5 bg-slate-800 text-white placeholder:text-slate-500 border border-slate-700 rounded-lg text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+                id="admin-email"
+                name="email"
+                placeholder="admin@shongjog.edu"
+                required
+                type="email"
+              />
+            </div>
+          </div>
+
+          <div className="space-y-1.5">
+            <label className="text-xs font-semibold text-slate-300" htmlFor="admin-password">
+              Password
+            </label>
+            <div className="relative">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
+                <LockKeyhole className="size-4" />
+              </div>
+              <input
+                autoComplete="current-password"
+                className="block w-full pl-10 pr-4 py-2.5 bg-slate-800 text-white placeholder:text-slate-500 border border-slate-700 rounded-lg text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+                id="admin-password"
+                minLength={8}
+                name="password"
+                placeholder="••••••••"
+                required
+                type="password"
+              />
+            </div>
+          </div>
+
           <Button
-            className="h-12 w-full bg-blue-600 text-white shadow-lg shadow-blue-500/20 hover:bg-blue-700"
+            className="h-11 w-full bg-blue-600 text-white shadow-lg shadow-blue-500/20 hover:bg-blue-700"
             size="lg"
             type="submit"
           >
-            <LockKeyhole aria-hidden="true" />
-            Authenticate with Google
+            <LockKeyhole aria-hidden="true" className="size-4" />
+            <span>Sign In to Admin Console</span>
           </Button>
         </form>
 
