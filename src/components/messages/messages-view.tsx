@@ -4,6 +4,7 @@ import { ConversationList } from "@/components/messages/conversation-list";
 import { MessageThread } from "@/components/messages/message-thread";
 import { AppShell } from "@/components/shongjog/app-shell";
 import { ShongjogCard } from "@/components/shongjog/surface";
+import type { ConnectionUser } from "@/lib/connections/types";
 import type {
   ConversationSummary,
   ConversationThread,
@@ -12,17 +13,16 @@ import type { PublicProfile } from "@/lib/profile/types";
 
 function EmptyChatPanel() {
   return (
-    <ShongjogCard className="hidden min-h-[calc(100dvh-8rem)] items-center justify-center p-8 text-center lg:flex">
+    <ShongjogCard className="hidden min-h-[calc(100dvh-9rem)] items-center justify-center p-8 text-center lg:flex border-border/80">
       <div className="max-w-sm">
-        <div className="mx-auto flex size-14 items-center justify-center rounded-full bg-[#E1F7EE] text-[#0F5A47]">
-          <MessageCircle aria-hidden="true" className="size-6" />
+        <div className="mx-auto flex size-14 items-center justify-center rounded-2xl bg-primary/10 text-primary">
+          <MessageCircle className="size-7" />
         </div>
-        <h2 className="mt-4 text-xl font-bold text-[#191C1B]">
+        <h2 className="mt-4 text-lg font-bold text-foreground">
           Select a conversation
         </h2>
-        <p className="mt-2 text-sm leading-6 text-[#3F4945]">
-          Open a message thread from the list, or start one from a connected
-          member profile.
+        <p className="mt-2 text-xs sm:text-sm text-muted-foreground leading-relaxed">
+          Choose a conversation from the left, or connect with members on Discover to start collaborating.
         </p>
       </div>
     </ShongjogCard>
@@ -31,6 +31,7 @@ function EmptyChatPanel() {
 
 export function MessagesView({
   activeConversationId,
+  connectedFriends = [],
   conversations,
   currentUserId,
   error,
@@ -38,6 +39,7 @@ export function MessagesView({
   thread,
 }: {
   activeConversationId?: string;
+  connectedFriends?: ConnectionUser[];
   conversations: ConversationSummary[];
   currentUserId: string;
   error?: string | null;
@@ -46,15 +48,16 @@ export function MessagesView({
 }) {
   return (
     <AppShell active="Messages" profile={profile}>
-      <div className="mx-auto grid w-full max-w-[1280px] gap-5 px-4 pb-24 pt-5 sm:px-6 lg:grid-cols-[22rem_minmax(0,1fr)] lg:px-8 lg:pb-8">
+      <div className="mx-auto grid w-full max-w-7xl gap-6 px-4 sm:px-6 lg:grid-cols-[22rem_minmax(0,1fr)]">
         <div className={thread ? "hidden lg:block" : "block"}>
           {error ? (
-            <p className="mb-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-red-700">
+            <p className="mb-4 rounded-2xl border border-destructive/30 bg-destructive/10 px-4 py-3 text-xs sm:text-sm font-medium text-destructive">
               {error}
             </p>
           ) : null}
           <ConversationList
             activeConversationId={activeConversationId}
+            connectedFriends={connectedFriends}
             conversations={conversations}
           />
         </div>

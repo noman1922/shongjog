@@ -13,11 +13,11 @@ export function StartMessageButton({
     <form action={startConversationAction}>
       <input name="otherUserId" type="hidden" value={otherUserId} />
       <button
-        className={`inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-lg border border-[#1E293B] px-4 text-sm font-semibold text-[#1E293B] transition hover:bg-[#F2F4F1] sm:w-auto ${className}`}
+        className={`inline-flex min-h-9 w-full items-center justify-center gap-1.5 rounded-full border border-primary/40 bg-primary/10 dark:bg-primary/20 px-4 text-xs font-semibold text-primary hover:bg-primary hover:text-white transition-colors sm:w-auto ${className}`}
         type="submit"
       >
-        <MessageCircle aria-hidden="true" className="size-4" />
-        Message
+        <MessageCircle aria-hidden="true" className="size-3.5" />
+        <span>Message</span>
       </button>
     </form>
   );

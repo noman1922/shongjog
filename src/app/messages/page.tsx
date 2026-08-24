@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 
 import { MessagesView } from "@/components/messages/messages-view";
+import { getConnectionsOverview } from "@/lib/connections/data";
 import { getConversationSummaries } from "@/lib/messages/data";
 import { getOnboardingStatus } from "@/lib/onboarding/status";
 import { getOwnProfile } from "@/lib/profile/data";
@@ -53,11 +54,16 @@ export default async function MessagesPage({
     redirect("/onboarding");
   }
 
-  const conversations = await getConversationSummaries(user.id);
+  const [conversations, connectionsOverview] = await Promise.all([
+    getConversationSummaries(user.id),
+    getConnectionsOverview(),
+  ]);
+  const connectedFriends = connectionsOverview.connected.map((c) => c.otherUser);
   const params = await searchParams;
 
   return (
     <MessagesView
+      connectedFriends={connectedFriends}
       conversations={conversations}
       currentUserId={user.id}
       error={messageError(params.error)}

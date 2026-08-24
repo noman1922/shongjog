@@ -1,6 +1,7 @@
 import { notFound, redirect } from "next/navigation";
 
 import { MessagesView } from "@/components/messages/messages-view";
+import { getConnectionsOverview } from "@/lib/connections/data";
 import {
   getConversationSummaries,
   getConversationThread,
@@ -49,22 +50,26 @@ export default async function ConversationPage({
 
   const query = await searchParams;
   const cursor = Array.isArray(query.cursor) ? query.cursor[0] : query.cursor;
-  const [conversations, thread] = await Promise.all([
+  const [conversations, thread, connectionsOverview] = await Promise.all([
     getConversationSummaries(user.id),
     getConversationThread({
       conversationId,
       cursor,
       currentUserId: user.id,
     }),
+    getConnectionsOverview(),
   ]);
 
   if (!thread) {
     notFound();
   }
 
+  const connectedFriends = connectionsOverview.connected.map((c) => c.otherUser);
+
   return (
     <MessagesView
       activeConversationId={conversationId}
+      connectedFriends={connectedFriends}
       conversations={conversations}
       currentUserId={user.id}
       profile={profile}

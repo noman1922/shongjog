@@ -1,6 +1,7 @@
 "use client";
 
 import { ArrowLeft, Send, Trash2 } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
 import { useRef, useState } from "react";
 
@@ -8,25 +9,15 @@ import {
   deleteOwnMessageAction,
   sendMessageAction,
 } from "@/app/messages/actions";
+import { ShongjogCard } from "@/components/shongjog/surface";
 import type { ConversationThread } from "@/lib/messages/types";
-import { cn } from "@/lib/utils";
+import { cn, getInitials } from "@/lib/utils";
 
 function formatTimestamp(value: string) {
   return new Intl.DateTimeFormat("en", {
     hour: "numeric",
     minute: "2-digit",
   }).format(new Date(value));
-}
-
-function initials(name: string | null) {
-  return (
-    name
-      ?.split(" ")
-      .map((part) => part[0])
-      .join("")
-      .slice(0, 2)
-      .toUpperCase() || "S"
-  );
 }
 
 export function MessageThread({
@@ -40,43 +31,62 @@ export function MessageThread({
   const [sendError, setSendError] = useState<string | null>(null);
   const [isSending, setIsSending] = useState(false);
   const formRef = useRef<HTMLFormElement>(null);
+  const isStudent = thread.otherUser.role === "student";
 
   return (
-    <section className="flex min-h-[calc(100dvh-8rem)] flex-col overflow-hidden rounded-xl border border-[#BFC9C3] bg-white shadow-[0_4px_12px_rgba(30,41,59,0.04)] lg:min-h-[calc(100dvh-7rem)]">
-      <header className="flex items-center gap-3 border-b border-[#BFC9C3]/70 p-4">
+    <ShongjogCard className="flex min-h-[calc(100dvh-9rem)] flex-col overflow-hidden border-border/80">
+      {/* Thread Header */}
+      <header className="flex items-center gap-3 border-b border-border/60 dark:border-slate-800 p-4">
         <Link
-          className="flex size-10 shrink-0 items-center justify-center rounded-full text-[#3F4945] hover:bg-[#F2F4F1] lg:hidden"
+          className="flex size-9 shrink-0 items-center justify-center rounded-full text-muted-foreground hover:bg-muted lg:hidden"
           href="/messages"
         >
-          <ArrowLeft aria-hidden="true" className="size-5" />
-          <span className="sr-only">Back to conversations</span>
+          <ArrowLeft className="size-5" />
+          <span className="sr-only">Back to list</span>
         </Link>
-        {thread.otherUser.avatarUrl ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
-            alt=""
-            className="size-11 rounded-full object-cover"
-            src={thread.otherUser.avatarUrl}
-          />
-        ) : (
-          <div className="flex size-11 items-center justify-center rounded-full bg-[#E6E9E5] text-sm font-bold text-[#0F5A47]">
-            {initials(thread.otherUser.fullName)}
-          </div>
-        )}
+
+        <div className="relative size-10 shrink-0 overflow-hidden rounded-full ring-2 ring-primary/20 shadow-sm">
+          {thread.otherUser.avatarUrl ? (
+            <Image
+              alt={thread.otherUser.fullName ?? "Avatar"}
+              className="size-full rounded-full object-cover"
+              height={40}
+              src={thread.otherUser.avatarUrl}
+              width={40}
+            />
+          ) : (
+            <div className="flex size-full items-center justify-center rounded-full bg-primary/10 text-primary font-bold text-xs">
+              {getInitials(thread.otherUser.fullName)}
+            </div>
+          )}
+        </div>
+
         <div className="min-w-0 flex-1">
-          <h1 className="truncate text-base font-bold text-[#191C1B]">
-            {thread.otherUser.fullName ?? "Shongjog member"}
-          </h1>
-          <p className="truncate text-sm capitalize text-[#747875]">
-            {thread.otherUser.role}
+          <div className="flex items-center gap-2">
+            <h1 className="truncate text-sm sm:text-base font-bold text-foreground">
+              {thread.otherUser.fullName ?? "Shongjog member"}
+            </h1>
+            <span
+              className={`hidden sm:inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold capitalize ${
+                isStudent
+                  ? "bg-blue-50 dark:bg-blue-950/60 text-blue-700 dark:text-blue-300"
+                  : "bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300"
+              }`}
+            >
+              {thread.otherUser.role}
+            </span>
+          </div>
+          <p className="truncate text-xs text-muted-foreground">
+            @{thread.otherUser.username ?? "member"}
           </p>
         </div>
       </header>
 
-      <div className="flex-1 space-y-3 overflow-y-auto bg-[#F8FAF7] p-4">
+      {/* Messages Feed Area */}
+      <div className="flex-1 space-y-3 overflow-y-auto bg-muted/20 dark:bg-slate-950/30 p-4">
         {thread.nextCursor ? (
           <Link
-            className="mx-auto flex min-h-10 w-fit items-center justify-center rounded-lg border border-[#BFC9C3] bg-white px-4 text-sm font-semibold text-[#1E293B] hover:bg-[#F2F4F1]"
+            className="mx-auto flex min-h-8 w-fit items-center justify-center rounded-full border border-border bg-card px-4 text-xs font-semibold text-foreground hover:bg-muted transition-colors shadow-sm"
             href={`/messages/${thread.conversationId}?cursor=${encodeURIComponent(
               thread.nextCursor
             )}`}
@@ -84,6 +94,7 @@ export function MessageThread({
             Load older messages
           </Link>
         ) : null}
+
         {messages.length > 0 ? (
           messages.map((message) => (
             <article
@@ -95,19 +106,19 @@ export function MessageThread({
             >
               <div
                 className={cn(
-                  "max-w-[82%] rounded-2xl px-4 py-2 shadow-sm sm:max-w-[70%]",
+                  "max-w-[85%] sm:max-w-[72%] rounded-2xl px-4 py-2.5 shadow-sm transition-shadow",
                   message.isOwn
-                    ? "rounded-br-md bg-[#0F5A47] text-white"
-                    : "rounded-bl-md border border-[#BFC9C3] bg-white text-[#191C1B]"
+                    ? "rounded-br-sm bg-primary text-white"
+                    : "rounded-bl-sm border border-border/80 dark:border-slate-800 bg-card text-foreground"
                 )}
               >
-                <p className="whitespace-pre-wrap break-words text-sm leading-6">
+                <p className="whitespace-pre-wrap break-words text-xs sm:text-sm leading-relaxed">
                   {message.content}
                 </p>
                 <div
                   className={cn(
-                    "mt-1 flex items-center gap-2 text-[11px]",
-                    message.isOwn ? "text-white/75" : "text-[#747875]"
+                    "mt-1 flex items-center justify-end gap-2 text-[10px]",
+                    message.isOwn ? "text-white/80" : "text-muted-foreground"
                   )}
                 >
                   <span>{formatTimestamp(message.createdAt)}</span>
@@ -120,11 +131,11 @@ export function MessageThread({
                       />
                       <input name="messageId" type="hidden" value={message.id} />
                       <button
-                        className="opacity-0 transition group-hover:opacity-100"
+                        className="opacity-0 transition group-hover:opacity-100 hover:text-white"
                         type="submit"
                       >
-                        <Trash2 aria-hidden="true" className="size-3.5" />
-                        <span className="sr-only">Delete message</span>
+                        <Trash2 className="size-3" />
+                        <span className="sr-only">Delete</span>
                       </button>
                     </form>
                   ) : null}
@@ -133,15 +144,15 @@ export function MessageThread({
             </article>
           ))
         ) : (
-          <div className="flex min-h-64 items-center justify-center text-center">
-            <p className="max-w-sm text-sm leading-6 text-[#3F4945]">
-              No messages yet. Send the first note to start this private
-              conversation.
+          <div className="flex min-h-48 items-center justify-center text-center">
+            <p className="max-w-xs text-xs text-muted-foreground leading-relaxed">
+              No previous messages. Type below to start your conversation.
             </p>
           </div>
         )}
       </div>
 
+      {/* Input Message Form */}
       <form
         action={async (formData) => {
           setIsSending(true);
@@ -158,7 +169,7 @@ export function MessageThread({
             if (result.message) {
               const sentMessage = result.message;
               setMessages((current) => {
-                if (current.some((message) => message.id === sentMessage.id)) {
+                if (current.some((m) => m.id === sentMessage.id)) {
                   return current;
                 }
 
@@ -182,15 +193,15 @@ export function MessageThread({
             setIsSending(false);
           }
         }}
-        className="flex gap-2 border-t border-[#BFC9C3]/70 bg-white p-3"
+        className="flex items-end gap-2 border-t border-border/60 dark:border-slate-800 bg-card p-3"
         ref={formRef}
       >
         <div className="min-w-0 flex-1">
           <input name="conversationId" type="hidden" value={thread.conversationId} />
           <label>
-            <span className="sr-only">Message</span>
+            <span className="sr-only">Write message</span>
             <textarea
-              className="max-h-32 min-h-11 w-full resize-none rounded-xl border border-[#BFC9C3] bg-[#F8FAF7] px-4 py-3 text-sm leading-5 outline-none transition placeholder:text-[#747875] focus:border-[#0F5A47] focus:ring-4 focus:ring-[#0F5A47]/15"
+              className="max-h-28 min-h-10 w-full resize-none rounded-2xl border border-border/70 dark:border-slate-700 bg-muted/40 dark:bg-slate-800/60 px-4 py-2.5 text-xs sm:text-sm leading-relaxed outline-none transition placeholder:text-muted-foreground focus:border-primary focus:bg-card dark:focus:bg-slate-800 focus:ring-2 focus:ring-primary/20 text-foreground"
               maxLength={2000}
               name="content"
               placeholder="Write a message..."
@@ -198,18 +209,18 @@ export function MessageThread({
             />
           </label>
           {sendError ? (
-            <p className="mt-2 text-sm font-medium text-red-700">{sendError}</p>
+            <p className="mt-1 text-xs font-semibold text-destructive">{sendError}</p>
           ) : null}
         </div>
         <button
-          className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-[#0F5A47] text-white hover:bg-[#0B4939] disabled:cursor-not-allowed disabled:opacity-60"
+          aria-label="Send message"
+          className="flex size-10 shrink-0 items-center justify-center rounded-full bg-primary text-white shadow-sm hover:bg-primary/90 active:scale-95 disabled:opacity-50 transition-all mb-0.5"
           disabled={isSending}
           type="submit"
         >
-          <Send aria-hidden="true" className="size-5" />
-          <span className="sr-only">Send</span>
+          <Send className="size-4" />
         </button>
       </form>
-    </section>
+    </ShongjogCard>
   );
 }
