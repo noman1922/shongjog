@@ -1,7 +1,9 @@
 import "server-only";
 
+import { cache } from "react";
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
+
 
 function getSupabaseServerConfig() {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -21,7 +23,9 @@ export async function createClient() {
   return createServerClient(supabaseUrl, supabaseKey, {
     cookies: {
       getAll() {
-        return cookieStore.getAll();
+        return cookieStore
+          .getAll()
+          .filter((c) => c.value && c.value.trim() !== "" && c.value !== '""');
       },
       setAll(cookiesToSet) {
         try {
@@ -35,3 +39,18 @@ export async function createClient() {
     },
   });
 }
+
+export const getAuthUser = cache(async () => {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  return user ?? null;
+});
+
+export const getAuthUserId = cache(async () => {
+  const user = await getAuthUser();
+  return user?.id ?? null;
+});
+
