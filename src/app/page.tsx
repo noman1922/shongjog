@@ -1,27 +1,25 @@
 import { redirect } from "next/navigation";
 
 import { LandingPage } from "@/components/landing/landing-page";
-import { createClient } from "@/lib/supabase/server";
+import { getOnboardingStatus } from "@/lib/onboarding/status";
+import { getAuthUser } from "@/lib/supabase/server";
 
 export default async function HomePage({
   searchParams,
 }: {
   searchParams: Promise<{ error?: string; signup?: string }>;
 }) {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getAuthUser();
 
   if (user) {
-    const { data: profile } = await supabase
-      .from("users")
-      .select("role")
-      .eq("id", user.id)
-      .maybeSingle();
+    const status = await getOnboardingStatus();
 
-    if (profile?.role === "admin") {
+    if (status.role === "admin") {
       redirect("/admin");
+    }
+
+    if (!status.completed) {
+      redirect("/onboarding");
     }
 
     redirect("/dashboard");

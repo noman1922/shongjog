@@ -89,6 +89,7 @@ export type FeedPost = {
 
 export type FeedSuggestion = {
   avatarUrl: string | null;
+  connectionStatus?: "pending" | "accepted" | null;
   fullName: string | null;
   id: string;
   role: "student" | "alumni";
@@ -333,7 +334,7 @@ async function getRecentComments(postIds: string[]) {
 
 async function getSidebarData(viewerUserId: string, role: "student" | "alumni") {
   const supabase = await createClient();
-  const [notifications, suggestions, opportunities] = await Promise.all([
+  const [notifications, suggestions, opportunities, connections] = await Promise.all([
     supabase
       .from("notifications")
       .select("id", { count: "exact", head: true })
@@ -343,15 +344,27 @@ async function getSidebarData(viewerUserId: string, role: "student" | "alumni") 
       .from("users")
       .select("id, role, full_name, username, avatar_url")
       .neq("id", viewerUserId)
+      .neq("role", "admin")
       .eq("role", role === "student" ? "alumni" : "student")
-      .limit(5),
+      .limit(8),
     supabase
       .from("opportunities")
       .select("id, type, title, company_name, location, deadline")
       .eq("status", "open")
       .order("created_at", { ascending: false })
       .limit(4),
+    supabase
+      .from("connections")
+      .select("requester_id, receiver_id, status")
+      .or(`requester_id.eq.${viewerUserId},receiver_id.eq.${viewerUserId}`)
+      .in("status", ["pending", "accepted"]),
   ]);
+
+  const connectionMap = new Map<string, "pending" | "accepted">();
+  (connections.data ?? []).forEach((conn) => {
+    const otherId = conn.requester_id === viewerUserId ? conn.receiver_id : conn.requester_id;
+    connectionMap.set(otherId, conn.status as "pending" | "accepted");
+  });
 
   return {
     notificationsCount: notifications.count ?? 0,
@@ -373,10 +386,11 @@ async function getSidebarData(viewerUserId: string, role: "student" | "alumni") 
     suggestions: ((suggestions.data ?? []) as DbUser[])
       .filter(
         (suggestion): suggestion is DbUser & { role: "student" | "alumni" } =>
-          suggestion.role !== "admin"
+          suggestion.role !== "admin" && suggestion.id !== viewerUserId
       )
       .map((suggestion) => ({
         avatarUrl: suggestion.avatar_url,
+        connectionStatus: connectionMap.get(suggestion.id) ?? null,
         fullName: suggestion.full_name,
         id: suggestion.id,
         role: suggestion.role,

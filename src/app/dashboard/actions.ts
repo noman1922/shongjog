@@ -67,17 +67,31 @@ export async function createPostAction(formData: FormData) {
   const parsed = postSchema.safeParse({
     content: formString(formData, "content"),
   });
+  const imageUrl = formString(formData, "imageUrl");
   const { error, profile, supabase, user } = await getFeedActor();
 
   if (!parsed.success || error || !profile || !user) {
     redirect("/dashboard");
   }
 
-  await supabase.from("posts").insert({
-    content: parsed.data.content,
-    post_type: "general",
-    user_id: user.id,
-  });
+  const { data: newPost } = await supabase
+    .from("posts")
+    .insert({
+      content: parsed.data.content,
+      post_type: "general",
+      user_id: user.id,
+    })
+    .select("id")
+    .single();
+
+  if (newPost && imageUrl) {
+    await supabase.from("post_media").insert({
+      media_type: "image/jpeg",
+      media_url: imageUrl,
+      post_id: newPost.id,
+      sort_order: 0,
+    });
+  }
 
   refreshFeed(profile.username);
   redirect("/dashboard");
@@ -85,21 +99,10 @@ export async function createPostAction(formData: FormData) {
 
 export async function togglePostLikeAction(formData: FormData) {
   const parsed = postIdSchema.safeParse(formString(formData, "postId"));
-  const { error, profile, supabase, user } = await getFeedActor();
+  const { error, supabase, user } = await getFeedActor();
 
-  if (!parsed.success || error || !profile || !user) {
-    redirect("/dashboard");
-  }
-
-  const { data: post } = await supabase
-    .from("posts")
-    .select("id")
-    .eq("id", parsed.data)
-    .is("deleted_at", null)
-    .maybeSingle();
-
-  if (!post) {
-    redirect("/dashboard");
+  if (!parsed.success || error || !user) {
+    return { error: "Failed to toggle like" };
   }
 
   const { data: reaction } = await supabase
@@ -115,15 +118,15 @@ export async function togglePostLikeAction(formData: FormData) {
       .delete()
       .eq("id", reaction.id)
       .eq("user_id", user.id);
+    return { liked: false };
   } else {
     await supabase.from("post_reactions").insert({
       post_id: parsed.data,
       reaction_type: "like",
       user_id: user.id,
     });
+    return { liked: true };
   }
-
-  refreshFeed(profile.username);
 }
 
 export async function addCommentAction(formData: FormData) {
@@ -134,7 +137,7 @@ export async function addCommentAction(formData: FormData) {
   const { error, profile, supabase, user } = await getFeedActor();
 
   if (!parsed.success || error || !profile || !user) {
-    redirect("/dashboard");
+    return { error: "Failed to add comment" };
   }
 
   const { data: post } = await supabase
@@ -145,18 +148,29 @@ export async function addCommentAction(formData: FormData) {
     .maybeSingle();
 
   if (!post) {
-    redirect("/dashboard");
+    return { error: "Post not found" };
   }
 
-  await supabase.from("comments").insert({
-    content: parsed.data.content,
-    post_id: parsed.data.postId,
-    user_id: user.id,
-  });
+  const { data: newComment, error: commentErr } = await supabase
+    .from("comments")
+    .insert({
+      content: parsed.data.content,
+      post_id: parsed.data.postId,
+      user_id: user.id,
+    })
+    .select("id, content, created_at")
+    .single();
 
-  refreshFeed(profile.username);
-  redirect("/dashboard");
+  if (commentErr) {
+    return { error: commentErr.message };
+  }
+
+  return {
+    comment: newComment,
+    success: true,
+  };
 }
+
 
 export async function deleteOwnPostAction(formData: FormData) {
   const parsed = postIdSchema.safeParse(formString(formData, "postId"));

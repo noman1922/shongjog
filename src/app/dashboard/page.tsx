@@ -4,17 +4,17 @@ import { DashboardView } from "@/components/dashboard/dashboard-view";
 import { getHomeFeedData } from "@/lib/feed/data";
 import { getOnboardingStatus } from "@/lib/onboarding/status";
 import { getOwnProfile } from "@/lib/profile/data";
-import { createClient } from "@/lib/supabase/server";
+import { getAuthUser } from "@/lib/supabase/server";
+
+import { getAdminAnnouncementsList } from "@/lib/admin/data";
+import { getActiveDbStories } from "@/lib/stories/data";
 
 export default async function DashboardPage({
   searchParams,
 }: {
   searchParams: Promise<{ cursor?: string | string[] }>;
 }) {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getAuthUser();
 
   if (!user) {
     redirect("/login");
@@ -38,11 +38,37 @@ export default async function DashboardPage({
 
   const params = await searchParams;
   const cursor = Array.isArray(params.cursor) ? params.cursor[0] : params.cursor;
-  const data = await getHomeFeedData({
-    cursor,
-    profile,
-    userId: user.id,
-  });
 
-  return <DashboardView data={data} profile={profile} />;
+  try {
+    const [data, initialDbStories, announcements] = await Promise.all([
+      getHomeFeedData({
+        cursor,
+        profile,
+        userId: user.id,
+      }),
+      getActiveDbStories(user.id, profile.details.universityId),
+      getAdminAnnouncementsList(),
+    ]);
+
+    const activeAnnouncement = announcements.find((a) => a.isActive) ?? null;
+
+    return (
+      <DashboardView
+        announcement={activeAnnouncement}
+        data={data}
+        initialDbStories={initialDbStories}
+        profile={profile}
+      />
+    );
+  } catch (error) {
+    console.error("Dashboard feed loading error:", error);
+    const fallbackData = {
+      nextCursor: null,
+      notificationsCount: 0,
+      opportunities: [],
+      posts: [],
+      suggestions: [],
+    };
+    return <DashboardView data={fallbackData} profile={profile} />;
+  }
 }

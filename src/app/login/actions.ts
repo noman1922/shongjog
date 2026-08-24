@@ -37,10 +37,10 @@ const emailSignUpSchema = z
   .object({
     confirmPassword: z.string(),
     email: z
-      .string()
-      .trim()
-      .email("Enter a valid email address.")
-      .transform((v) => v.toLowerCase()),
+    .string()
+    .trim()
+    .email("Enter a valid email address.")
+    .transform((v) => v.toLowerCase()),
     fullName: z
       .string()
       .trim()
@@ -138,12 +138,44 @@ export async function signInWithEmail(formData: FormData) {
     authErrorRedirect(friendlyAuthError(error?.message ?? "Authentication failed."));
   }
 
-  // Check user role from public.users
-  const { data: userProfile } = await supabase
+  // Check user role from public.users and ensure record exists
+  let { data: userProfile } = await supabase
     .from("users")
     .select("role")
     .eq("id", authData.user.id)
     .maybeSingle();
+
+  if (!userProfile) {
+    const rawRole = authData.user.user_metadata?.role;
+    const role = rawRole === "alumni" || rawRole === "admin" ? rawRole : "student";
+    const fullName =
+      authData.user.user_metadata?.full_name ||
+      authData.user.user_metadata?.name ||
+      authData.user.email?.split("@")[0] ||
+      "Member";
+    const username =
+      authData.user.user_metadata?.username ||
+      authData.user.email?.split("@")[0] ||
+      `user_${authData.user.id.slice(0, 8)}`;
+
+    const { data: insertedUser } = await supabase
+      .from("users")
+      .upsert(
+        {
+          email: authData.user.email,
+          full_name: fullName,
+          id: authData.user.id,
+          is_active: true,
+          role,
+          username,
+        },
+        { onConflict: "id" }
+      )
+      .select("role")
+      .maybeSingle();
+
+    userProfile = insertedUser;
+  }
 
   // Block admin users from logging in via standard user login
   if (userProfile?.role === "admin") {
@@ -210,11 +242,12 @@ export async function signUpWithEmail(formData: FormData) {
     email: parsed.data.email,
     password: parsed.data.password,
     options: {
-      emailRedirectTo,
       data: {
         full_name: parsed.data.fullName,
+        role: "student",
         username: parsed.data.username,
       },
+      emailRedirectTo,
     },
   });
 
@@ -273,10 +306,10 @@ export async function signInWithOAuth(
   const supabase = await createClient();
 
   const { data, error } = await supabase.auth.signInWithOAuth({
-    provider,
     options: {
       redirectTo: `${origin}/auth/callback?next=${encodeURIComponent(next)}`,
     },
+    provider,
   });
 
   if (error) {
@@ -287,4 +320,3 @@ export async function signInWithOAuth(
     redirect(data.url);
   }
 }
-
