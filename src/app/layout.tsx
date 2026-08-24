@@ -3,18 +3,30 @@ import { Inter, Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
 
 const inter = Inter({
-  variable: "--font-inter",
   subsets: ["latin"],
+  variable: "--font-inter",
 });
 
 const plusJakartaSans = Plus_Jakarta_Sans({
-  variable: "--font-plus-jakarta",
   subsets: ["latin"],
+  variable: "--font-plus-jakarta",
 });
 
 export const metadata: Metadata = {
-  title: "Shongjog",
-  description: "University student and alumni networking platform.",
+  description:
+    "Premier university student and alumni networking platform in Bangladesh. Connect, collaborate, and discover opportunities.",
+  icons: {
+    apple: [
+      { type: "image/png", url: "/apple-icon.png" },
+      { type: "image/png", url: "/icon.png" },
+    ],
+    icon: [
+      { type: "image/png", url: "/icon.png" },
+      { type: "image/png", url: "/brand/icon.png" },
+    ],
+    shortcut: "/icon.png",
+  },
+  title: "Shongjog - University Student & Alumni Network",
 };
 
 export default function RootLayout({
@@ -24,10 +36,20 @@ export default function RootLayout({
 }>) {
   return (
     <html
-      lang="en"
       className={`${inter.variable} ${plusJakartaSans.variable} h-full antialiased`}
+      lang="en"
+      suppressHydrationWarning
     >
-      <body className="min-h-full flex flex-col">{children}</body>
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(){try{var t=localStorage.getItem('shongjog-theme');if(t==='dark'||(!t&&window.matchMedia('(prefers-color-scheme: dark)').matches)){document.documentElement.classList.add('dark');}}catch(e){}})();`,
+          }}
+        />
+      </head>
+      <body className="min-h-full flex flex-col bg-background text-foreground selection:bg-primary/20 selection:text-primary">
+        {children}
+      </body>
     </html>
   );
 }

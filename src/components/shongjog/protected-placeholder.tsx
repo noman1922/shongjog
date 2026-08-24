@@ -1,9 +1,10 @@
+import { Briefcase, Sparkles } from "lucide-react";
 import { redirect } from "next/navigation";
 
 import { AppShell } from "@/components/shongjog/app-shell";
 import { ShongjogCard } from "@/components/shongjog/surface";
 import { getOnboardingStatus } from "@/lib/onboarding/status";
-import { getOwnProfile } from "@/lib/profile/data";
+import { getViewerProfile } from "@/lib/profile/data";
 import { createClient } from "@/lib/supabase/server";
 
 export async function ProtectedPlaceholder({
@@ -32,7 +33,7 @@ export async function ProtectedPlaceholder({
     redirect("/admin");
   }
 
-  const profile = await getOwnProfile();
+  const profile = await getViewerProfile();
 
   if (!profile) {
     redirect("/onboarding");
@@ -40,19 +41,25 @@ export async function ProtectedPlaceholder({
 
   return (
     <AppShell active={active} profile={profile}>
-      <div className="mx-auto w-full max-w-[960px] px-4 pb-24 pt-6 sm:px-6 lg:px-8 lg:pb-8">
-        <ShongjogCard className="p-6">
-          <p className="text-sm font-semibold uppercase tracking-wide text-[#14B8A6]">
-            Shongjog
-          </p>
-          <h1 className="mt-2 text-3xl font-bold text-[#191C1B]">{title}</h1>
-          <p className="mt-3 text-sm leading-6 text-[#3F4945]">
-            This section is connected to the new app shell and reserved for the
-            next product build-out.
+      <div className="mx-auto w-full max-w-4xl px-4 sm:px-6">
+        <ShongjogCard className="p-8 sm:p-12 text-center">
+          <div className="mx-auto flex size-16 items-center justify-center rounded-3xl bg-primary/10 text-primary mb-4 shadow-sm">
+            <Briefcase className="size-8" />
+          </div>
+
+          <div className="inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-3.5 py-1 text-xs font-bold text-primary mb-3">
+            <Sparkles className="size-3.5" />
+            <span>Coming Soon</span>
+          </div>
+
+          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-foreground">
+            {title} Hub
+          </h1>
+          <p className="mx-auto mt-3 max-w-lg text-xs sm:text-sm text-muted-foreground leading-relaxed">
+            Discover curated internships, research grants, job openings, and alumni mentorship programs specifically tailored for your department and university circle.
           </p>
         </ShongjogCard>
       </div>
     </AppShell>
   );
 }
-

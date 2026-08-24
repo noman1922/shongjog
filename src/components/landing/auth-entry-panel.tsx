@@ -1,114 +1,58 @@
 "use client";
 
-import { Eye, EyeOff, LockKeyhole, Mail, UserRound } from "lucide-react";
+import { AtSign, Eye, EyeOff, Lock, Mail, User } from "lucide-react";
 import { useState } from "react";
 
 import {
   signInWithEmail,
-  signInWithGoogle,
   signUpWithEmail,
 } from "@/app/login/actions";
 
 type AuthMode = "signin" | "signup";
 
-function GoogleMark() {
-  return (
-    <span
-      aria-hidden="true"
-      className="flex size-5 items-center justify-center rounded-full bg-white text-sm font-bold text-[#1E293B]"
-    >
-      G
-    </span>
-  );
-}
-
 function PasswordField({
   autoComplete,
   label,
   name,
+  placeholder = "••••••••",
 }: {
   autoComplete: string;
   label: string;
   name: string;
+  placeholder?: string;
 }) {
   const [visible, setVisible] = useState(false);
 
   return (
-    <label className="block space-y-2">
-      <span className="text-sm font-semibold text-[#191C1B]">{label}</span>
-      <span className="relative block">
-        <LockKeyhole
-          aria-hidden="true"
-          className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-[#747875]"
-        />
+    <div className="space-y-1.5">
+      <div className="flex items-center justify-between">
+        <label className="text-xs sm:text-sm font-semibold text-foreground" htmlFor={name}>
+          {label}
+        </label>
+      </div>
+      <div className="relative">
+        <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-muted-foreground">
+          <Lock className="size-4" />
+        </div>
         <input
           autoComplete={autoComplete}
-          className="min-h-12 w-full rounded-xl border border-[#BFC9C3] bg-white px-10 text-base outline-none transition placeholder:text-[#747875] focus:border-[#0F5A47] focus:ring-4 focus:ring-[#0F5A47]/15 sm:text-sm"
-          minLength={8}
+          className="block w-full pl-10 pr-10 py-3 bg-muted/60 dark:bg-slate-800/80 text-foreground placeholder:text-muted-foreground border border-border/70 dark:border-slate-700 rounded-xl focus:border-primary focus:bg-card dark:focus:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-primary/20 transition-colors text-sm"
+          id={name}
+          minLength={6}
           name={name}
+          placeholder={placeholder}
           required
           type={visible ? "text" : "password"}
         />
         <button
           aria-label={visible ? "Hide password" : "Show password"}
-          className="absolute right-2 top-1/2 flex size-9 -translate-y-1/2 items-center justify-center rounded-lg text-[#747875] hover:bg-[#F2F4F1] hover:text-[#0F5A47]"
-          onClick={() => setVisible((value) => !value)}
+          className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-muted-foreground hover:text-foreground transition-colors"
+          onClick={() => setVisible((v) => !v)}
           type="button"
         >
-          {visible ? (
-            <EyeOff aria-hidden="true" className="size-4" />
-          ) : (
-            <Eye aria-hidden="true" className="size-4" />
-          )}
+          {visible ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
         </button>
-      </span>
-    </label>
-  );
-}
-
-function TextField({
-  autoComplete,
-  icon,
-  label,
-  name,
-  type = "text",
-}: {
-  autoComplete: string;
-  icon: "mail" | "user";
-  label: string;
-  name: string;
-  type?: "email" | "text";
-}) {
-  const Icon = icon === "mail" ? Mail : UserRound;
-
-  return (
-    <label className="block space-y-2">
-      <span className="text-sm font-semibold text-[#191C1B]">{label}</span>
-      <span className="relative block">
-        <Icon
-          aria-hidden="true"
-          className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-[#747875]"
-        />
-        <input
-          autoComplete={autoComplete}
-          className="min-h-12 w-full rounded-xl border border-[#BFC9C3] bg-white px-10 text-base outline-none transition placeholder:text-[#747875] focus:border-[#0F5A47] focus:ring-4 focus:ring-[#0F5A47]/15 sm:text-sm"
-          name={name}
-          required
-          type={type}
-        />
-      </span>
-    </label>
-  );
-}
-
-function Divider() {
-  return (
-    <div className="flex items-center gap-3 py-1">
-      <span className="h-px flex-1 bg-[#BFC9C3]/80" />
-      <span className="text-xs font-semibold uppercase tracking-wide text-[#747875]">
-        or
-      </span>
-      <span className="h-px flex-1 bg-[#BFC9C3]/80" />
+      </div>
     </div>
   );
 }
@@ -122,58 +66,99 @@ export function AuthEntryPanel({
   const isSignin = mode === "signin";
 
   return (
-    <section className="w-full rounded-2xl border border-[#BFC9C3] bg-white p-5 shadow-[0_16px_40px_rgba(30,41,59,0.10)] sm:p-6 lg:p-8">
-      <div>
-        <p className="text-sm font-semibold uppercase tracking-wide text-[#14B8A6]">
-          {isSignin ? "Sign in" : "Create account"}
-        </p>
-        <h2 className="mt-2 text-2xl font-bold tracking-tight text-[#191C1B] sm:text-3xl">
-          {isSignin ? "Sign in" : "Create your Shongjog account"}
+    <div className="w-full space-y-6">
+      {/* Title */}
+      <div className="text-center md:text-left space-y-1.5">
+        <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-foreground">
+          {isSignin ? "Welcome Back" : "Create Account"}
         </h2>
-        <p className="mt-3 text-sm leading-6 text-[#3F4945]">
+        <p className="text-xs sm:text-sm text-muted-foreground">
           {isSignin
-            ? "Welcome back to your Shongjog network."
-            : "Start with your account, then choose Student or Alumni during onboarding."}
+            ? "Log in to your Shongjog account."
+            : "Sign up to join your university student & alumni network."}
         </p>
       </div>
 
-      <form action={signInWithGoogle} className="mt-6">
-        <input name="next" type="hidden" value="/dashboard" />
-        <button
-          className="inline-flex min-h-12 w-full items-center justify-center gap-3 rounded-xl bg-[#0F5A47] px-4 text-sm font-bold text-white shadow-sm transition hover:bg-[#0B4939]"
-          type="submit"
-        >
-          <GoogleMark />
-          Continue with Google
-        </button>
-      </form>
-
-      <Divider />
-
+      {/* Main Email Form */}
       <form
         action={isSignin ? signInWithEmail : signUpWithEmail}
-        className="mt-1 space-y-4"
+        className="space-y-4"
       >
         {!isSignin ? (
-          <TextField
-            autoComplete="name"
-            icon="user"
-            label="Full name"
-            name="fullName"
-          />
+          <>
+            <div className="space-y-1.5">
+              <label className="text-xs sm:text-sm font-semibold text-foreground" htmlFor="fullName">
+                Full name
+              </label>
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-muted-foreground">
+                  <User className="size-4" />
+                </div>
+                <input
+                  autoComplete="name"
+                  className="block w-full pl-10 pr-4 py-3 bg-muted/60 dark:bg-slate-800/80 text-foreground placeholder:text-muted-foreground border border-border/70 dark:border-slate-700 rounded-xl focus:border-primary focus:bg-card dark:focus:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-primary/20 transition-colors text-sm"
+                  id="fullName"
+                  name="fullName"
+                  placeholder="Rahim Ahmed"
+                  required
+                  type="text"
+                />
+              </div>
+            </div>
+
+            <div className="space-y-1.5">
+              <label className="text-xs sm:text-sm font-semibold text-foreground" htmlFor="username">
+                Username
+              </label>
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-muted-foreground">
+                  <AtSign className="size-4" />
+                </div>
+                <input
+                  autoComplete="username"
+                  autoCapitalize="none"
+                  className="block w-full pl-10 pr-4 py-3 bg-muted/60 dark:bg-slate-800/80 text-foreground placeholder:text-muted-foreground border border-border/70 dark:border-slate-700 rounded-xl focus:border-primary focus:bg-card dark:focus:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-primary/20 transition-colors text-sm"
+                  id="username"
+                  name="username"
+                  pattern="^[a-zA-Z0-9_]{3,30}$"
+                  placeholder="rahimahmed"
+                  required
+                  title="3-30 characters, letters, numbers, and underscores only"
+                  type="text"
+                />
+              </div>
+            </div>
+          </>
         ) : null}
-        <TextField
-          autoComplete="email"
-          icon="mail"
-          label="Email"
-          name="email"
-          type="email"
-        />
+
+        {/* Email Input */}
+        <div className="space-y-1.5">
+          <label className="text-xs sm:text-sm font-semibold text-foreground" htmlFor="email">
+            Email address
+          </label>
+          <div className="relative">
+            <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-muted-foreground">
+              <Mail className="size-4" />
+            </div>
+            <input
+              autoComplete="email"
+              className="block w-full pl-10 pr-4 py-3 bg-muted/60 dark:bg-slate-800/80 text-foreground placeholder:text-muted-foreground border border-border/70 dark:border-slate-700 rounded-xl focus:border-primary focus:bg-card dark:focus:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-primary/20 transition-colors text-sm"
+              id="email"
+              name="email"
+              placeholder="you@university.edu.bd"
+              required
+              type="email"
+            />
+          </div>
+        </div>
+
+        {/* Password */}
         <PasswordField
           autoComplete={isSignin ? "current-password" : "new-password"}
           label="Password"
           name="password"
         />
+
         {!isSignin ? (
           <PasswordField
             autoComplete="new-password"
@@ -181,24 +166,27 @@ export function AuthEntryPanel({
             name="confirmPassword"
           />
         ) : null}
+
+        {/* Submit Button */}
         <button
-          className="inline-flex min-h-12 w-full items-center justify-center rounded-xl bg-[#1E293B] px-4 text-sm font-bold text-white shadow-sm transition hover:bg-[#111827]"
+          className="w-full flex justify-center py-3 px-4 rounded-full font-semibold text-sm text-white bg-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary shadow-sm hover:shadow-md transition-all active:scale-95 cursor-pointer"
           type="submit"
         >
-          {isSignin ? "Sign in" : "Create account"}
+          {isSignin ? "Log In" : "Create Account"}
         </button>
       </form>
 
-      <p className="mt-6 text-center text-sm text-[#3F4945]">
-        {isSignin ? "New to Shongjog?" : "Already have an account?"}{" "}
+      {/* Mode Switch Link */}
+      <p className="text-center text-xs sm:text-sm text-muted-foreground pt-2">
+        {isSignin ? "Don't have an account?" : "Already have an account?"}{" "}
         <button
-          className="font-bold text-[#0F5A47] underline-offset-4 hover:underline"
+          className="font-bold text-primary hover:underline ml-1 cursor-pointer"
           onClick={() => setMode(isSignin ? "signup" : "signin")}
           type="button"
         >
-          {isSignin ? "Create account" : "Sign in"}
+          {isSignin ? "Sign up" : "Log in"}
         </button>
       </p>
-    </section>
+    </div>
   );
 }
