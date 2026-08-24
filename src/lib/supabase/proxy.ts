@@ -20,19 +20,30 @@ function copyResponseCookies(from: NextResponse, to: NextResponse) {
 
 export async function updateSession(request: NextRequest) {
   const { supabaseKey, supabaseUrl } = getSupabaseProxyConfig();
-  let supabaseResponse = NextResponse.next({ request });
+  const requestHeaders = new Headers(request.headers);
+  let supabaseResponse = NextResponse.next({
+    request: {
+      headers: requestHeaders,
+    },
+  });
 
   const supabase = createServerClient(supabaseUrl, supabaseKey, {
     cookies: {
       getAll() {
-        return request.cookies.getAll();
+        return request.cookies
+          .getAll()
+          .filter((c) => c.value && c.value.trim() !== "" && c.value !== '""');
       },
       setAll(cookiesToSet) {
         cookiesToSet.forEach(({ name, value }) => {
           request.cookies.set(name, value);
         });
 
-        supabaseResponse = NextResponse.next({ request });
+        supabaseResponse = NextResponse.next({
+          request: {
+            headers: requestHeaders,
+          },
+        });
 
         cookiesToSet.forEach(({ name, value, options }) => {
           supabaseResponse.cookies.set(name, value, options);
@@ -45,142 +56,115 @@ export async function updateSession(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser();
 
-  const pathname = request.nextUrl.pathname;
+  let userRole: string | null = null;
 
-  if (!user && (pathname.startsWith("/dashboard") || pathname.startsWith("/messages"))) {
-    const redirectUrl = request.nextUrl.clone();
-    redirectUrl.pathname = "/";
-    redirectUrl.searchParams.set("next", pathname);
+  if (user) {
+    requestHeaders.set("x-user-id", user.id);
 
-    const redirectResponse = NextResponse.redirect(redirectUrl);
-    copyResponseCookies(supabaseResponse, redirectResponse);
-
-    return redirectResponse;
-  }
-
-  if (!user && pathname.startsWith("/admin")) {
-    if (pathname === "/admin/login") {
-      return supabaseResponse;
-    }
-
-    const redirectUrl = request.nextUrl.clone();
-    redirectUrl.pathname = "/admin/login";
-
-    const redirectResponse = NextResponse.redirect(redirectUrl);
-    copyResponseCookies(supabaseResponse, redirectResponse);
-
-    return redirectResponse;
-  }
-
-  if (!user && pathname.startsWith("/onboarding")) {
-    const redirectUrl = request.nextUrl.clone();
-    redirectUrl.pathname = "/login";
-    redirectUrl.searchParams.set("next", pathname);
-
-    const redirectResponse = NextResponse.redirect(redirectUrl);
-    copyResponseCookies(supabaseResponse, redirectResponse);
-
-    return redirectResponse;
-  }
-
-  if (
-    user &&
-    (pathname === "/login" ||
-      pathname.startsWith("/messages") ||
-      pathname.startsWith("/dashboard") ||
-      pathname.startsWith("/onboarding"))
-  ) {
     const { data: profile } = await supabase
       .from("users")
       .select("role")
       .eq("id", user.id)
       .maybeSingle();
 
+    userRole =
+      (profile?.role as string | undefined) ??
+      (user.app_metadata?.role as string | undefined) ??
+      (user.user_metadata?.role as string | undefined) ??
+      null;
+
+    if (userRole) {
+      requestHeaders.set("x-user-role", userRole);
+    }
+  }
+
+  const pathname = request.nextUrl.pathname;
+
+  // 1. Unauthenticated Request Guards
+  if (!user) {
+    if (
+      pathname.startsWith("/dashboard") ||
+      pathname.startsWith("/messages") ||
+      pathname.startsWith("/profile") ||
+      pathname.startsWith("/connections") ||
+      pathname.startsWith("/discover")
+    ) {
+      const redirectUrl = request.nextUrl.clone();
+      redirectUrl.pathname = "/";
+      redirectUrl.searchParams.set("next", pathname);
+
+      const redirectResponse = NextResponse.redirect(redirectUrl);
+      copyResponseCookies(supabaseResponse, redirectResponse);
+      return redirectResponse;
+    }
+
     if (pathname.startsWith("/admin")) {
-      if (profile?.role === "admin") {
-        if (pathname === "/admin/login") {
-          const redirectResponse = NextResponse.redirect(
-            new URL("/admin", request.url)
-          );
-          copyResponseCookies(supabaseResponse, redirectResponse);
-
-          return redirectResponse;
-        }
-
-        return supabaseResponse;
-      }
-
       if (pathname === "/admin/login") {
         return supabaseResponse;
       }
 
-      const redirectResponse = NextResponse.redirect(
-        new URL("/admin/login?error=forbidden", request.url)
-      );
-      copyResponseCookies(supabaseResponse, redirectResponse);
+      const redirectUrl = request.nextUrl.clone();
+      redirectUrl.pathname = "/admin/login";
 
+      const redirectResponse = NextResponse.redirect(redirectUrl);
+      copyResponseCookies(supabaseResponse, redirectResponse);
       return redirectResponse;
     }
 
-    if (!profile) {
-      if (pathname.startsWith("/onboarding")) {
-        return supabaseResponse;
-      }
+    if (pathname.startsWith("/onboarding")) {
+      const redirectUrl = request.nextUrl.clone();
+      redirectUrl.pathname = "/login";
+      redirectUrl.searchParams.set("next", pathname);
 
-      const redirectResponse = NextResponse.redirect(
-        new URL("/onboarding", request.url)
-      );
+      const redirectResponse = NextResponse.redirect(redirectUrl);
       copyResponseCookies(supabaseResponse, redirectResponse);
-
       return redirectResponse;
     }
 
-    if (profile.role === "admin") {
-      if (
-        pathname.startsWith("/dashboard") ||
-        pathname.startsWith("/messages") ||
-        pathname.startsWith("/onboarding") ||
-        pathname === "/login"
-      ) {
-        const redirectResponse = NextResponse.redirect(
-          new URL("/admin", request.url)
-        );
-        copyResponseCookies(supabaseResponse, redirectResponse);
+    return supabaseResponse;
+  }
 
-        return redirectResponse;
-      }
-
-      return supabaseResponse;
-    }
-
-    const profileTable =
-      profile.role === "alumni" ? "alumni_profiles" : "student_profiles";
-    const { data: roleProfile } = await supabase
-      .from(profileTable)
-      .select("id")
-      .eq("user_id", user.id)
-      .maybeSingle();
-
-    if (roleProfile && (pathname.startsWith("/onboarding") || pathname === "/login")) {
-      const redirectResponse = NextResponse.redirect(
-        new URL("/dashboard", request.url)
-      );
-      copyResponseCookies(supabaseResponse, redirectResponse);
-
-      return redirectResponse;
-    }
-
+  // 2. Authenticated Admin Route Routing & Bypasses
+  if (userRole === "admin") {
+    // If admin is on onboarding, dashboard, login, admin/login, or root -> direct to /admin
     if (
-      !roleProfile &&
-      (pathname.startsWith("/dashboard") ||
-        pathname.startsWith("/messages") ||
-        pathname === "/login")
+      pathname.startsWith("/onboarding") ||
+      pathname.startsWith("/dashboard") ||
+      pathname === "/admin/login" ||
+      pathname === "/login" ||
+      pathname === "/"
     ) {
-      const redirectResponse = NextResponse.redirect(
-        new URL("/onboarding", request.url)
-      );
-      copyResponseCookies(supabaseResponse, redirectResponse);
+      const redirectUrl = request.nextUrl.clone();
+      redirectUrl.pathname = "/admin";
+      redirectUrl.search = "";
 
+      const redirectResponse = NextResponse.redirect(redirectUrl);
+      copyResponseCookies(supabaseResponse, redirectResponse);
+      return redirectResponse;
+    }
+
+    return supabaseResponse;
+  }
+
+  // 3. Authenticated Non-Admin Route Guards
+  if (userRole !== "admin") {
+    // Disallow non-admins from /admin or /admin/*
+    if (pathname.startsWith("/admin")) {
+      const redirectUrl = request.nextUrl.clone();
+      redirectUrl.pathname = "/dashboard";
+
+      const redirectResponse = NextResponse.redirect(redirectUrl);
+      copyResponseCookies(supabaseResponse, redirectResponse);
+      return redirectResponse;
+    }
+
+    // Redirect away from login page if already signed in
+    if (pathname === "/login") {
+      const redirectUrl = request.nextUrl.clone();
+      redirectUrl.pathname = "/dashboard";
+
+      const redirectResponse = NextResponse.redirect(redirectUrl);
+      copyResponseCookies(supabaseResponse, redirectResponse);
       return redirectResponse;
     }
   }
