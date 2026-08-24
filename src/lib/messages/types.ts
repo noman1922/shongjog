@@ -25,6 +25,8 @@ export type DirectMessage = {
   id: string;
   isOwn: boolean;
   senderId: string;
+  status?: "sending" | "sent" | "error";
+  tempId?: string;
 };
 
 export type ConversationThread = {

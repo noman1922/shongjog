@@ -82,15 +82,14 @@ export async function startConversationAction(formData: FormData) {
   redirect(`/messages/${conversationId}`);
 }
 
-export async function sendMessageAction(
-  _previousState: SendMessageState,
-  formData: FormData
+export async function sendDirectMessageAction(
+  conversationId: string,
+  content: string
 ): Promise<SendMessageState> {
   const parsed = sendMessageSchema.safeParse({
-    content: formString(formData, "content"),
-    conversationId: formString(formData, "conversationId"),
+    content: content?.trim(),
+    conversationId,
   });
-  const { error, user } = await getMessagingActor();
 
   if (!parsed.success) {
     return {
@@ -99,6 +98,7 @@ export async function sendMessageAction(
     };
   }
 
+  const { error, user } = await getMessagingActor();
   if (error || !user) {
     return { error: error ?? "Please sign in again.", submittedAt: Date.now() };
   }
@@ -127,6 +127,15 @@ export async function sendMessageAction(
       submittedAt: Date.now(),
     };
   }
+}
+
+export async function sendMessageAction(
+  _previousState: SendMessageState,
+  formData: FormData
+): Promise<SendMessageState> {
+  const content = formString(formData, "content");
+  const conversationId = formString(formData, "conversationId");
+  return sendDirectMessageAction(conversationId, content);
 }
 
 export async function deleteOwnMessageAction(formData: FormData) {
