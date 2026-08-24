@@ -13,12 +13,14 @@ import {
   Users,
   X,
 } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
-import { useState } from "react";
+import { useRef, useState } from "react";
 
 import { signOutAction } from "@/app/profile/actions";
 import { ShongjogBrand } from "@/components/shongjog/brand";
 import { ThemeToggle } from "@/components/shongjog/theme-toggle";
+import { LogoutConfirmationModal } from "@/components/ui/logout-confirmation-modal";
 import type { PublicProfile, ViewerProfile } from "@/lib/profile/types";
 
 function initials(name: string | null) {
@@ -39,18 +41,19 @@ function NavAvatar({
   profile: ViewerProfile | PublicProfile;
   size?: "sm" | "md";
 }) {
+  const sizeClass = size === "sm" ? "size-8" : "size-9";
   const isStudent = profile.details.role === "student";
-  const sizeClass = size === "sm" ? "size-9" : "size-10";
 
   if (profile.avatarUrl) {
     return (
-      // eslint-disable-next-line @next/next/no-img-element
-      <img
-        alt={profile.fullName ?? "Avatar"}
+      <Image
+        alt={profile.fullName || "User Avatar"}
         className={`${sizeClass} rounded-full object-cover ring-2 ${
           isStudent ? "ring-primary/40" : "ring-emerald-500/40"
         }`}
+        height={size === "sm" ? 32 : 36}
         src={profile.avatarUrl}
+        width={size === "sm" ? 32 : 36}
       />
     );
   }
@@ -66,21 +69,25 @@ function NavAvatar({
 
 export function AppHeader({
   active = "Home",
+  pendingConnections = 0,
   profile,
   unreadMessages = 0,
 }: {
   active?: string;
+  pendingConnections?: number;
   profile: ViewerProfile | PublicProfile;
   unreadMessages?: number;
 }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
   const isStudent = profile.details.role === "student";
 
   const navLinks = [
-    { href: "/dashboard", icon: Home, label: "Home", activeLabel: "Home" },
-    { href: "/discover", icon: Compass, label: "Discover", activeLabel: "Discover" },
-    { href: "/connections", icon: Users, label: "Circles", activeLabel: "Circles" },
-    { href: "/opportunities", icon: BriefcaseBusiness, label: "Opportunities", activeLabel: "Opportunities" },
+    { activeLabel: "Home", href: "/dashboard", icon: Home, label: "Home" },
+    { activeLabel: "Discover", href: "/discover", icon: Compass, label: "Discover" },
+    { activeLabel: "Circles", href: "/connections", icon: Users, label: "Circles" },
+    { activeLabel: "Opportunities", href: "/opportunities", icon: BriefcaseBusiness, label: "Opportunities" },
   ];
 
   return (
@@ -92,7 +99,7 @@ export function AppHeader({
           <div className="flex items-center gap-3 lg:gap-4">
             <button
               aria-label="Open mobile menu"
-              className="flex size-9 items-center justify-center rounded-full text-muted-foreground hover:bg-muted hover:text-foreground md:hidden"
+              className="flex size-9 items-center justify-center rounded-full text-muted-foreground hover:bg-muted hover:text-foreground md:hidden cursor-pointer"
               onClick={() => setMobileMenuOpen(true)}
               type="button"
             >
@@ -111,7 +118,7 @@ export function AppHeader({
 
                 return (
                   <Link
-                    className={`flex items-center gap-2 rounded-full px-4 lg:px-5 py-2 text-sm font-semibold transition-all duration-200 ${
+                    className={`relative flex items-center gap-2 rounded-full px-4 lg:px-5 py-2 text-sm font-semibold transition-all duration-200 ${
                       isItemActive
                         ? "bg-primary text-white shadow-sm scale-95"
                         : "text-muted-foreground hover:bg-muted dark:hover:bg-slate-800 hover:text-foreground"
@@ -119,7 +126,14 @@ export function AppHeader({
                     href={item.href}
                     key={item.label}
                   >
-                    <Icon className="size-4" />
+                    <div className="relative">
+                      <Icon className="size-4" />
+                      {item.label === "Circles" && pendingConnections > 0 ? (
+                        <span className="absolute -top-1.5 -right-2 flex size-3.5 items-center justify-center rounded-full bg-rose-600 text-[8px] font-bold text-white ring-1 ring-card">
+                          {pendingConnections > 9 ? "9+" : pendingConnections}
+                        </span>
+                      ) : null}
+                    </div>
                     <span>{item.label}</span>
                   </Link>
                 );
@@ -167,17 +181,81 @@ export function AppHeader({
             {/* Theme Toggle */}
             <ThemeToggle />
 
-            {/* User Profile Avatar */}
-            <Link
-              aria-label="Your Profile"
-              className="flex items-center rounded-full p-0.5 transition-transform hover:scale-105 ml-1"
-              href="/profile"
-            >
-              <NavAvatar profile={profile} size="sm" />
-            </Link>
+            {/* User Profile Avatar with Dropdown */}
+            <div className="relative">
+              <button
+                aria-expanded={dropdownOpen}
+                aria-haspopup="true"
+                aria-label="User menu"
+                className="flex items-center rounded-full p-0.5 transition-transform hover:scale-105 ml-1 cursor-pointer focus:outline-none focus:ring-2 focus:ring-primary/30"
+                onClick={() => setDropdownOpen((prev) => !prev)}
+                type="button"
+              >
+                <NavAvatar profile={profile} size="sm" />
+              </button>
+
+              {dropdownOpen && (
+                <>
+                  <div
+                    className="fixed inset-0 z-40"
+                    onClick={() => setDropdownOpen(false)}
+                  />
+                  <div className="absolute right-0 mt-3 w-56 rounded-2xl border border-border/80 dark:border-slate-800 bg-card p-2 shadow-xl z-50 animate-in fade-in zoom-in-95 duration-150">
+                    <div className="p-2.5 border-b border-border/60 dark:border-slate-800">
+                      <p className="font-bold text-xs text-foreground truncate">
+                        {profile.fullName}
+                      </p>
+                      <p className="text-[11px] text-muted-foreground capitalize">
+                        {profile.details.role} Account
+                      </p>
+                    </div>
+
+                    <div className="py-1 space-y-0.5">
+                      <Link
+                        className="flex items-center gap-2.5 rounded-xl px-2.5 py-2 text-xs font-semibold text-foreground hover:bg-muted transition-colors"
+                        href="/profile"
+                        onClick={() => setDropdownOpen(false)}
+                      >
+                        <User className="size-4 text-muted-foreground" />
+                        <span>My Profile</span>
+                      </Link>
+
+                      <Link
+                        className="flex items-center gap-2.5 rounded-xl px-2.5 py-2 text-xs font-semibold text-foreground hover:bg-muted transition-colors"
+                        href="/profile/edit"
+                        onClick={() => setDropdownOpen(false)}
+                      >
+                        <Settings className="size-4 text-muted-foreground" />
+                        <span>Settings & Edit</span>
+                      </Link>
+                    </div>
+
+                    <div className="pt-1 border-t border-border/60 dark:border-slate-800">
+                      <button
+                        className="flex w-full items-center gap-2.5 rounded-xl px-2.5 py-2 text-xs font-semibold text-destructive hover:bg-destructive/10 transition-colors cursor-pointer"
+                        onClick={() => {
+                          setDropdownOpen(false);
+                          setIsLogoutModalOpen(true);
+                        }}
+                        type="button"
+                      >
+                        <LogOut className="size-4" />
+                        <span>Log Out</span>
+                      </button>
+                    </div>
+                  </div>
+                </>
+              )}
+            </div>
           </div>
         </nav>
       </header>
+
+      {/* Logout Confirmation Modal */}
+      <LogoutConfirmationModal
+        isOpen={isLogoutModalOpen}
+        onClose={() => setIsLogoutModalOpen(false)}
+      />
 
       {/* Mobile Drawer Overlay */}
       {mobileMenuOpen ? (
@@ -194,7 +272,7 @@ export function AppHeader({
             </div>
             <button
               aria-label="Close menu"
-              className="flex size-10 items-center justify-center rounded-full text-muted-foreground hover:bg-muted hover:text-foreground"
+              className="flex size-10 items-center justify-center rounded-full text-muted-foreground hover:bg-muted hover:text-foreground cursor-pointer"
               onClick={() => setMobileMenuOpen(false)}
               type="button"
             >
@@ -224,7 +302,7 @@ export function AppHeader({
 
               return (
                 <Link
-                  className={`flex items-center gap-3.5 rounded-2xl px-4 py-3 text-base font-semibold transition-colors ${
+                  className={`flex items-center justify-between rounded-2xl px-4 py-3 text-base font-semibold transition-colors ${
                     isItemActive
                       ? "bg-primary text-white"
                       : "text-foreground hover:bg-muted"
@@ -233,8 +311,15 @@ export function AppHeader({
                   key={item.label}
                   onClick={() => setMobileMenuOpen(false)}
                 >
-                  <Icon className="size-5" />
-                  <span>{item.label}</span>
+                  <span className="flex items-center gap-3.5">
+                    <Icon className="size-5" />
+                    <span>{item.label}</span>
+                  </span>
+                  {item.label === "Circles" && pendingConnections > 0 ? (
+                    <span className="flex size-5 items-center justify-center rounded-full bg-rose-600 text-white text-[11px] font-bold">
+                      {pendingConnections}
+                    </span>
+                  ) : null}
                 </Link>
               );
             })}
@@ -280,15 +365,17 @@ export function AppHeader({
               <span>Edit Profile & Settings</span>
             </Link>
 
-            <form action={signOutAction} className="mt-4">
-              <button
-                className="flex w-full items-center gap-3.5 rounded-2xl px-4 py-3 text-base font-semibold text-destructive hover:bg-destructive/10 transition-colors"
-                type="submit"
-              >
-                <LogOut className="size-5" />
-                <span>Log Out</span>
-              </button>
-            </form>
+            <button
+              className="flex w-full items-center gap-3.5 rounded-2xl px-4 py-3 text-base font-semibold text-destructive hover:bg-destructive/10 transition-colors cursor-pointer mt-4"
+              onClick={() => {
+                setMobileMenuOpen(false);
+                setIsLogoutModalOpen(true);
+              }}
+              type="button"
+            >
+              <LogOut className="size-5" />
+              <span>Log Out</span>
+            </button>
           </div>
         </div>
       ) : null}
