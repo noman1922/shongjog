@@ -1,47 +1,54 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Shongjog (সংযোগ) — University Student & Alumni Network
+
+[![Live Demo](https://img.shields.io/badge/Live_Deployment-Vercel-blue?style=for-the-badge&logo=vercel)](https://noman1922-shongjog.vercel.app/)
+[![Next.js](https://img.shields.io/badge/Next.js_15-black?style=for-the-badge&logo=next.js)](https://nextjs.org/)
+[![Supabase](https://img.shields.io/badge/Supabase-Database_%26_Auth-3ECF8E?style=for-the-badge&logo=supabase)](https://supabase.com/)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-Modern_UI-38B2AC?style=for-the-badge&logo=tailwind-css)](https://tailwindcss.com/)
+
+🔗 **Live Platform URL:** [https://noman1922-shongjog.vercel.app/](https://noman1922-shongjog.vercel.app/)
+
+---
+
+## Overview
+
+**Shongjog (সংযোগ)** is a full-stack academic networking and mentorship ecosystem designed to bridge the gap between university students, alumni, and faculty. It facilitates seamless collaboration, campus story sharing, career discovery, direct messaging, and institutional moderation within a unified, high-performance web platform.
+
+---
+
+## Core Features
+
+* **Authentication & Dual-Role Onboarding:** Automated onboarding flows tailored specifically for students and alumni with instant profile photo uploads.
+* **Interactive Stories Engine:** Expiring photo stories with live canvas rendering, headline text overlays, and connection-based feed distribution.
+* **Academic Discussion Feed:** Rich community feed supporting media uploads, real-time post interactions, comments, and university topic filters.
+* **Smart Connections & Peer Discovery:** University-wide directory to search, connect, and collaborate with verified peers and alumni mentors.
+* **Real-time Direct Messaging:** Zero-latency optimistic messaging interface powered by Supabase Realtime subscriptions.
+* **Institutional Moderation Panel:** Dedicated `/admin` dashboard featuring real-time KPI metrics, user management controls, content moderation, and campus announcements.
+
+---
+
+## System Architecture & Software Engineering Specifications
+
+* 📊 **Activity Diagram:** [View on Google Drive](https://drive.google.com/file/d/12wZiJhFOMasdtSo7SxBUUyLo7OQKWeQo/view?usp=sharing)
+* 🏊 **Swimlane Diagram:** [View on MockFlow](https://app.mockflow.com/iview/Mee2d895c1237fb18b1838b1b5317f13b1786473137938#/mode/view)
+* 🔄 **Sequence Diagram:** [View on Google Drive](https://drive.google.com/file/d/1nLBtwyhV4y6JHoTbqqBjhwbNCO0SM4a8/view?usp=sharing)
+
+---
+
+## Tech Stack
+
+| Domain | Technology |
+| :--- | :--- |
+| **Framework** | Next.js 15+ (App Router, Server Actions, Server Components) |
+| **Frontend** | React 19, TypeScript, Tailwind CSS, Lucide Icons |
+| **Database & Auth** | Supabase (PostgreSQL, Transaction Pooler, Row Level Security, Realtime) |
+| **Media & CDN Storage** | Cloudinary API |
+| **Deployment** | Vercel Serverless Edge (Collocated Singapore `sin1` Region) |
+
+---
 
 ## Getting Started
 
-First, run the development server:
-
+### 1. Clone the Repository
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
-
-Open the local URL printed by Next.js in your terminal with your browser to see the result.
-
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
-
-
-
-
-Activity Diagram : https://drive.google.com/file/d/12wZiJhFOMasdtSo7SxBUUyLo7OQKWeQo/view?usp=sharing
-
-
-Swimlane Diagram : https://app.mockflow.com/iview/Mee2d895c1237fb18b1838b1b5317f13b1786473137938#/mode/view
-
-
-Sequence Diagram : https://drive.google.com/file/d/1nLBtwyhV4y6JHoTbqqBjhwbNCO0SM4a8/view?usp=sharing
+git clone [https://github.com/noman1922/shongjog.git](https://github.com/noman1922/shongjog.git)
+cd shongjog
