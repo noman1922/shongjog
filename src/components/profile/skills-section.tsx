@@ -1,22 +1,18 @@
 import { ProfileSection } from "@/components/profile/profile-section";
+import { SkillPill } from "@/components/shongjog/surface";
 import type { ProfileSkill } from "@/lib/profile/types";
 
 export function SkillsSection({ skills }: { skills: ProfileSkill[] }) {
   return (
-    <ProfileSection title="Skills">
+    <ProfileSection title="Skills & Expertise">
       {skills.length > 0 ? (
         <div className="flex flex-wrap gap-2">
           {skills.map((skill) => (
-            <span
-              className="rounded-full border border-[#BFC9C3]/70 bg-[#F1F5F9] px-3 py-1.5 text-sm font-medium text-[#1E293B]"
-              key={skill.id}
-            >
-              {skill.name}
-            </span>
+            <SkillPill key={skill.id}>{skill.name}</SkillPill>
           ))}
         </div>
       ) : (
-        <p className="text-sm text-[#747875]">No skills added yet.</p>
+        <p className="text-xs sm:text-sm text-muted-foreground">No skills added yet.</p>
       )}
     </ProfileSection>
   );

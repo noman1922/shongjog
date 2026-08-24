@@ -1,7 +1,8 @@
 "use client";
 
 import { useActionState, useMemo, useState } from "react";
-import { Loader2, Plus, Save, Trash2 } from "lucide-react";
+import { ArrowLeft, Loader2, Plus, Save, Trash2 } from "lucide-react";
+import Link from "next/link";
 
 import {
   deleteExperienceAction,
@@ -10,6 +11,7 @@ import {
   saveProjectAction,
   updateProfileAction,
 } from "@/app/profile/actions";
+import { AvatarUpload } from "@/components/profile/avatar-upload";
 import { Button } from "@/components/ui/button";
 import { ProfileSection } from "@/components/profile/profile-section";
 import type {
@@ -31,8 +33,8 @@ type ActionState = {
 
 const initialState: ActionState = {};
 const fieldClass =
-  "min-h-11 w-full rounded-md border border-input bg-background px-3 py-2 text-base outline-none transition focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/40 sm:text-sm";
-const labelClass = "text-sm font-medium text-foreground";
+  "min-h-11 w-full rounded-xl border border-border/80 dark:border-slate-700 bg-muted/40 dark:bg-slate-800/60 px-3.5 py-2.5 text-sm outline-none transition focus:border-primary focus:bg-card dark:focus:bg-slate-800 focus:ring-2 focus:ring-primary/20 text-foreground placeholder:text-muted-foreground";
+const labelClass = "text-xs sm:text-sm font-semibold text-foreground";
 
 function ActionMessage({ state }: { state: ActionState }) {
   if (state.error) {
@@ -260,12 +262,42 @@ export function ProfileEditForm({
   return (
     <main className="min-h-dvh bg-muted/30 px-4 py-5 sm:px-6 sm:py-8 lg:py-10">
       <div className="mx-auto w-full max-w-5xl space-y-5">
-        <div className="space-y-2">
-          <p className="text-sm font-medium text-muted-foreground">Profile</p>
-          <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">
-            Edit your profile
-          </h1>
+        <div>
+          <Link
+            className="group inline-flex items-center gap-2 text-sm font-medium text-zinc-500 hover:text-zinc-900 dark:hover:text-white transition-colors mb-3"
+            href="/profile"
+          >
+            <ArrowLeft className="size-4 transition-transform group-hover:-translate-x-1" />
+            <span>Back to Profile</span>
+          </Link>
+          <div className="space-y-1">
+            <p className="text-sm font-medium text-muted-foreground">Profile</p>
+            <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">
+              Edit your profile
+            </h1>
+          </div>
         </div>
+
+        <ProfileSection
+          description="Update your photo to help university peers and alumni recognize you."
+          title="Profile picture"
+        >
+          <div className="flex flex-col items-center sm:flex-row sm:items-center gap-6 p-2">
+            <AvatarUpload
+              currentAvatarUrl={profile.avatarUrl}
+              fullName={profile.fullName}
+              size="xl"
+            />
+            <div className="text-center sm:text-left space-y-1.5">
+              <h3 className="text-sm font-bold text-foreground">
+                Upload custom profile photo
+              </h3>
+              <p className="text-xs text-muted-foreground max-w-md leading-relaxed">
+                Click your avatar to upload a new picture. Photos are automatically cropped to your face and stored securely on Cloudinary CDN. Supported formats: JPG, PNG, WebP (max 5MB).
+              </p>
+            </div>
+          </div>
+        </ProfileSection>
 
         <ProfileSection title="Basic details">
           <form action={action} className="space-y-5">
@@ -442,10 +474,16 @@ export function ProfileEditForm({
             </label>
 
             <ActionMessage state={state} />
-            <div className="flex justify-end">
+            <div className="flex flex-col-reverse sm:flex-row sm:items-center sm:justify-end gap-3 pt-2">
+              <Link
+                className="inline-flex h-11 items-center justify-center rounded-xl border border-border bg-card px-5 text-sm font-semibold text-foreground hover:bg-muted transition-colors text-center"
+                href="/profile"
+              >
+                Cancel
+              </Link>
               <SubmitButton isPending={isPending}>
                 <Save aria-hidden="true" />
-                Save profile
+                Save Changes
               </SubmitButton>
             </div>
           </form>
@@ -470,6 +508,25 @@ export function ProfileEditForm({
             </div>
           </ProfileSection>
         ) : null}
+
+        {/* Bottom Navigation Footer */}
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 rounded-2xl border border-border/80 dark:border-slate-800 bg-card p-5 shadow-sm">
+          <div>
+            <p className="text-sm font-semibold text-foreground">
+              Done making changes?
+            </p>
+            <p className="text-xs text-muted-foreground">
+              Return to your public profile to see your updated details and activity.
+            </p>
+          </div>
+          <Link
+            className="inline-flex h-10 w-full sm:w-auto items-center justify-center gap-2 rounded-xl bg-primary px-5 text-xs sm:text-sm font-semibold text-primary-foreground hover:bg-primary/90 transition-colors shadow-sm text-center"
+            href="/profile"
+          >
+            <ArrowLeft className="size-4" />
+            <span>Return to Profile</span>
+          </Link>
+        </div>
       </div>
     </main>
   );

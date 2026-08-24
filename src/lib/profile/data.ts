@@ -2,234 +2,290 @@ import "server-only";
 
 import { cache } from "react";
 
-import { createClient } from "@/lib/supabase/server";
+import { createClient, getAuthUserId } from "@/lib/supabase/server";
 import type {
   ProfileDetails,
   ProfileExperience,
   ProfileProject,
   ProfileSkill,
   PublicProfile,
+  ViewerProfile,
 } from "@/lib/profile/types";
 
-const PROFILE_EXPERIENCE_LIMIT = 20;
-const PROFILE_PROJECT_LIMIT = 24;
+export const getAuthenticatedUserId = cache(async () => {
+  return getAuthUserId();
+});
 
-type DbProfileUser = {
+
+export const getViewerProfile = cache(async (): Promise<ViewerProfile | null> => {
+  const viewerUserId = await getAuthenticatedUserId();
+
+  if (!viewerUserId) {
+    return null;
+  }
+
+  const supabase = await createClient();
+  const { data } = await supabase
+    .from("users")
+    .select("id, role, full_name, username, avatar_url")
+    .eq("id", viewerUserId)
+    .maybeSingle();
+
+  if (!data || data.role === "admin") {
+    return null;
+  }
+
+  return {
+    avatarUrl: data.avatar_url,
+    details: {
+      role: data.role as "student" | "alumni",
+    },
+    fullName: data.full_name,
+    id: data.id,
+    username: data.username,
+  };
+});
+
+const FULL_PROFILE_SELECT = `
+  id,
+  role,
+  full_name,
+  username,
+  avatar_url,
+  bio,
+  student_profiles (
+    university_id,
+    department_id,
+    graduation_year,
+    internship_available,
+    availability_text,
+    universities (name),
+    departments (name)
+  ),
+  alumni_profiles (
+    university_id,
+    department_id,
+    graduation_year,
+    company_name,
+    job_title,
+    professional_field,
+    experience_years,
+    universities (name),
+    departments (name)
+  ),
+  user_skills (
+    skills (id, name)
+  ),
+  projects (
+    id,
+    title,
+    description,
+    project_url,
+    image_url
+  ),
+  experiences (
+    id,
+    company,
+    position,
+    description,
+    start_date,
+    end_date,
+    is_current
+  )
+`;
+
+type RelationalProfileData = {
   avatar_url: string | null;
   bio: string | null;
   full_name: string | null;
   id: string;
   role: "student" | "alumni" | "admin";
   username: string | null;
+  student_profiles:
+    | {
+        availability_text: string | null;
+        department_id: string | null;
+        departments: { name: string } | { name: string }[] | null;
+        graduation_year: number | null;
+        internship_available: boolean;
+        universities: { name: string } | { name: string }[] | null;
+        university_id: string | null;
+      }
+    | {
+        availability_text: string | null;
+        department_id: string | null;
+        departments: { name: string } | { name: string }[] | null;
+        graduation_year: number | null;
+        internship_available: boolean;
+        universities: { name: string } | { name: string }[] | null;
+        university_id: string | null;
+      }[]
+    | null;
+  alumni_profiles:
+    | {
+        company_name: string | null;
+        department_id: string | null;
+        departments: { name: string } | { name: string }[] | null;
+        experience_years: number | null;
+        graduation_year: number | null;
+        job_title: string | null;
+        professional_field: string | null;
+        universities: { name: string } | { name: string }[] | null;
+        university_id: string | null;
+      }
+    | {
+        company_name: string | null;
+        department_id: string | null;
+        departments: { name: string } | { name: string }[] | null;
+        experience_years: number | null;
+        graduation_year: number | null;
+        job_title: string | null;
+        professional_field: string | null;
+        universities: { name: string } | { name: string }[] | null;
+        university_id: string | null;
+      }[]
+    | null;
+  user_skills:
+    | {
+        skills: { id: string; name: string } | { id: string; name: string }[] | null;
+      }[]
+    | null;
+  projects:
+    | {
+        description: string | null;
+        id: string;
+        image_url: string | null;
+        project_url: string | null;
+        title: string;
+      }[]
+    | null;
+  experiences:
+    | {
+        company: string;
+        description: string | null;
+        end_date: string | null;
+        id: string;
+        is_current: boolean;
+        position: string;
+        start_date: string | null;
+      }[]
+    | null;
 };
 
-export async function getAuthenticatedUserId() {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  return user?.id ?? null;
-}
-
-async function getAcademicNames(
-  universityId: string | null,
-  departmentId: string | null
-) {
-  const supabase = await createClient();
-  const [university, department] = await Promise.all([
-    universityId
-      ? supabase
-          .from("universities")
-          .select("name")
-          .eq("id", universityId)
-          .maybeSingle()
-      : Promise.resolve({ data: null }),
-    departmentId
-      ? supabase
-          .from("departments")
-          .select("name")
-          .eq("id", departmentId)
-          .maybeSingle()
-      : Promise.resolve({ data: null }),
-  ]);
-
-  return {
-    departmentName: department.data?.name ?? null,
-    universityName: university.data?.name ?? null,
-  };
-}
-
-async function getProfileDetails(
-  userId: string,
-  role: "student" | "alumni"
-): Promise<ProfileDetails | null> {
-  const supabase = await createClient();
-
-  if (role === "student") {
-    const { data } = await supabase
-      .from("student_profiles")
-      .select(
-        "university_id, department_id, graduation_year, internship_available, availability_text"
-      )
-      .eq("user_id", userId)
-      .maybeSingle();
-
-    if (!data) {
-      return null;
-    }
-
-    const names = await getAcademicNames(data.university_id, data.department_id);
-
-    return {
-      availabilityText: data.availability_text,
-      departmentId: data.department_id,
-      departmentName: names.departmentName,
-      graduationYear: data.graduation_year,
-      internshipAvailable: data.internship_available,
-      role,
-      universityId: data.university_id,
-      universityName: names.universityName,
-    };
-  }
-
-  const { data } = await supabase
-    .from("alumni_profiles")
-    .select(
-      "university_id, department_id, graduation_year, company_name, job_title, professional_field, experience_years"
-    )
-    .eq("user_id", userId)
-    .maybeSingle();
-
-  if (!data) {
+function extractRelation<T>(value: T | T[] | null | undefined): T | null {
+  if (!value) {
     return null;
   }
 
-  const names = await getAcademicNames(data.university_id, data.department_id);
-
-  return {
-    companyName: data.company_name,
-    departmentId: data.department_id,
-    departmentName: names.departmentName,
-    experienceYears: data.experience_years,
-    graduationYear: data.graduation_year,
-    jobTitle: data.job_title,
-    professionalField: data.professional_field,
-    role,
-    universityId: data.university_id,
-    universityName: names.universityName,
-  };
+  return Array.isArray(value) ? value[0] ?? null : value;
 }
 
-async function getProfileSkills(userId: string): Promise<ProfileSkill[]> {
-  const supabase = await createClient();
-  const { data: userSkills } = await supabase
-    .from("user_skills")
-    .select("skill_id")
-    .eq("user_id", userId);
-  const skillIds = (userSkills ?? []).map((skill) => skill.skill_id);
-
-  if (skillIds.length === 0) {
-    return [];
+function parsePublicProfile(
+  raw: RelationalProfileData,
+  viewerUserId: string | null
+): PublicProfile | null {
+  if (raw.role === "admin") {
+    return null;
   }
 
-  const { data: skills } = await supabase
-    .from("skills")
-    .select("id, name")
-    .in("id", skillIds)
-    .order("name", { ascending: true });
+  let details: ProfileDetails | null = null;
 
-  return (skills ?? []) as ProfileSkill[];
-}
+  if (raw.role === "student") {
+    const student = extractRelation(raw.student_profiles);
+    const university = extractRelation(student?.universities);
+    const department = extractRelation(student?.departments);
 
-async function getProjects(userId: string): Promise<ProfileProject[]> {
-  const supabase = await createClient();
-  const { data } = await supabase
-    .from("projects")
-    .select("id, title, description, project_url, image_url")
-    .eq("user_id", userId)
-    .order("updated_at", { ascending: false })
-    .limit(PROFILE_PROJECT_LIMIT);
+    details = {
+      availabilityText: student?.availability_text ?? null,
+      departmentId: student?.department_id ?? null,
+      departmentName: department?.name ?? null,
+      graduationYear: student?.graduation_year ?? null,
+      internshipAvailable: student?.internship_available ?? false,
+      role: "student",
+      universityId: student?.university_id ?? null,
+      universityName: university?.name ?? null,
+    };
+  } else if (raw.role === "alumni") {
+    const alumni = extractRelation(raw.alumni_profiles);
+    const university = extractRelation(alumni?.universities);
+    const department = extractRelation(alumni?.departments);
 
-  return (data ?? []).map((project) => ({
+    details = {
+      companyName: alumni?.company_name ?? null,
+      departmentId: alumni?.department_id ?? null,
+      departmentName: department?.name ?? null,
+      experienceYears: alumni?.experience_years ?? null,
+      graduationYear: alumni?.graduation_year ?? null,
+      jobTitle: alumni?.job_title ?? null,
+      professionalField: alumni?.professional_field ?? null,
+      role: "alumni",
+      universityId: alumni?.university_id ?? null,
+      universityName: university?.name ?? null,
+    };
+  } else {
+    details = {
+      availabilityText: null,
+      departmentId: null,
+      departmentName: null,
+      graduationYear: null,
+      internshipAvailable: false,
+      role: "student",
+      universityId: null,
+      universityName: null,
+    };
+  }
+
+  const skills: ProfileSkill[] = (raw.user_skills ?? [])
+    .map((item) => extractRelation(item.skills))
+    .filter((skill): skill is ProfileSkill => Boolean(skill))
+    .sort((a, b) => a.name.localeCompare(b.name));
+
+  const projects: ProfileProject[] = (raw.projects ?? []).map((project) => ({
     description: project.description,
     id: project.id,
     imageUrl: project.image_url,
     projectUrl: project.project_url,
     title: project.title,
   }));
-}
 
-async function getExperiences(userId: string): Promise<ProfileExperience[]> {
-  const supabase = await createClient();
-  const { data } = await supabase
-    .from("experiences")
-    .select("id, company, position, description, start_date, end_date, is_current")
-    .eq("user_id", userId)
-    .order("start_date", { ascending: false, nullsFirst: false })
-    .limit(PROFILE_EXPERIENCE_LIMIT);
-
-  return (data ?? []).map((experience) => ({
-    company: experience.company,
-    description: experience.description,
-    endDate: experience.end_date,
-    id: experience.id,
-    isCurrent: experience.is_current,
-    position: experience.position,
-    startDate: experience.start_date,
-  }));
-}
-
-async function composeProfile(
-  profileUser: DbProfileUser,
-  viewerUserId: string | null
-): Promise<PublicProfile | null> {
-  if (profileUser.role === "admin") {
-    return null;
-  }
-
-  const details = await getProfileDetails(profileUser.id, profileUser.role);
-
-  if (!details) {
-    return null;
-  }
-
-  const [skills, projects, experiences] = await Promise.all([
-    getProfileSkills(profileUser.id),
-    getProjects(profileUser.id),
-    profileUser.role === "alumni"
-      ? getExperiences(profileUser.id)
-      : Promise.resolve([]),
-  ]);
+  const experiences: ProfileExperience[] =
+    raw.role === "alumni"
+      ? (raw.experiences ?? []).map((exp) => ({
+          company: exp.company,
+          description: exp.description,
+          endDate: exp.end_date,
+          id: exp.id,
+          isCurrent: exp.is_current,
+          position: exp.position,
+          startDate: exp.start_date,
+        }))
+      : [];
 
   return {
-    avatarUrl: profileUser.avatar_url,
-    bio: profileUser.bio,
+    avatarUrl: raw.avatar_url,
+    bio: raw.bio,
     details,
     experiences,
-    fullName: profileUser.full_name,
-    id: profileUser.id,
-    isOwner: viewerUserId === profileUser.id,
+    fullName: raw.full_name,
+    id: raw.id,
+    isOwner: viewerUserId === raw.id,
     projects,
     skills,
-    username: profileUser.username,
+    username: raw.username,
   };
 }
 
-export const getOwnProfile = cache(async () => {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  const viewerUserId = user?.id ?? null;
+export const getOwnProfile = cache(async (): Promise<PublicProfile | null> => {
+  const viewerUserId = await getAuthenticatedUserId();
 
   if (!viewerUserId) {
     return null;
   }
 
+  const supabase = await createClient();
   const { data } = await supabase
     .from("users")
-    .select("id, role, full_name, username, avatar_url, bio")
+    .select(FULL_PROFILE_SELECT)
     .eq("id", viewerUserId)
     .maybeSingle();
 
@@ -237,24 +293,43 @@ export const getOwnProfile = cache(async () => {
     return null;
   }
 
-  return composeProfile(data as DbProfileUser, viewerUserId);
+  return parsePublicProfile(data as unknown as RelationalProfileData, viewerUserId);
 });
 
-export const getProfileByUsername = cache(async (username: string) => {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  const viewerUserId = user?.id ?? null;
-  const { data } = await supabase
-    .from("users")
-    .select("id, role, full_name, username, avatar_url, bio")
-    .eq("username", username.toLowerCase())
-    .maybeSingle();
+export const getProfileByUsername = cache(
+  async (username: string): Promise<PublicProfile | null> => {
+    const viewerUserId = await getAuthenticatedUserId();
+    const supabase = await createClient();
+    const { data } = await supabase
+      .from("users")
+      .select(FULL_PROFILE_SELECT)
+      .eq("username", username.toLowerCase())
+      .maybeSingle();
 
-  if (!data) {
-    return null;
+    if (!data) {
+      return null;
+    }
+
+    return parsePublicProfile(data as unknown as RelationalProfileData, viewerUserId);
   }
+);
 
-  return composeProfile(data as DbProfileUser, viewerUserId);
-});
+export const getProfileById = cache(
+  async (userId: string): Promise<PublicProfile | null> => {
+    const viewerUserId = await getAuthenticatedUserId();
+    const supabase = await createClient();
+    const { data } = await supabase
+      .from("users")
+      .select(FULL_PROFILE_SELECT)
+      .eq("id", userId)
+      .maybeSingle();
+
+    if (!data) {
+      return null;
+    }
+
+    return parsePublicProfile(data as unknown as RelationalProfileData, viewerUserId);
+  }
+);
+
+

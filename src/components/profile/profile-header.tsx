@@ -1,3 +1,5 @@
+"use client";
+
 import {
   BriefcaseBusiness,
   Edit3,
@@ -8,23 +10,14 @@ import {
   ShieldCheck,
   Users,
 } from "lucide-react";
-import type { ReactNode } from "react";
+import Image from "next/image";
+import { useState, type ReactNode } from "react";
 
-import { signOutAction } from "@/app/profile/actions";
+import { LogoutConfirmationModal } from "@/components/ui/logout-confirmation-modal";
 import { SkillPill } from "@/components/shongjog/surface";
 import { Button, LinkButton } from "@/components/ui/button";
 import type { PublicProfile } from "@/lib/profile/types";
-
-function initials(name: string | null) {
-  return (
-    name
-      ?.split(" ")
-      .map((part) => part[0])
-      .join("")
-      .slice(0, 2)
-      .toUpperCase() || "S"
-  );
-}
+import { getInitials } from "@/lib/utils";
 
 export function ProfileHeader({
   connectionActions,
@@ -35,12 +28,14 @@ export function ProfileHeader({
   messageAction?: ReactNode;
   profile: PublicProfile;
 }) {
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
   const academicLine = [
     profile.details.departmentName,
     profile.details.universityName,
   ]
     .filter(Boolean)
     .join(", ");
+
   const isStudent = profile.details.role === "student";
   const subtitle =
     profile.details.role === "alumni"
@@ -52,145 +47,155 @@ export function ProfileHeader({
           .join(" • ");
 
   return (
-    <header className="overflow-hidden rounded-xl border border-[#BFC9C3] bg-white shadow-[0_4px_16px_rgba(30,41,59,0.06)]">
-      {isStudent ? (
-        <div className="h-32 bg-[linear-gradient(135deg,#0F5A47,#14B8A6)] sm:h-44" />
-      ) : (
-        <div className="h-20 bg-[#F2F4F1] sm:h-24" />
-      )}
+    <header className="overflow-hidden rounded-[24px] border border-border/80 dark:border-slate-800 bg-card shadow-md">
+      {/* Banner / Cover */}
+      <div
+        className={`h-36 sm:h-48 w-full relative ${
+          isStudent
+            ? "bg-gradient-to-r from-[#0050cb] via-blue-600 to-indigo-600"
+            : "bg-gradient-to-r from-slate-900 via-indigo-950 to-blue-950"
+        }`}
+      >
+        <div className="absolute inset-0 bg-black/10" />
+      </div>
+
       <div className="relative p-5 sm:p-8">
         <div className="flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between">
           <div className="flex min-w-0 flex-col gap-4 sm:flex-row sm:items-end">
-            <div className="-mt-20 shrink-0 sm:-mt-24">
-          {profile.avatarUrl ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
-              alt=""
-                    className={`size-28 rounded-full border-4 border-white object-cover shadow-lg sm:size-32 ${
-                      isStudent ? "" : "ring-2 ring-[#0F5A47]"
-                    }`}
-              src={profile.avatarUrl}
-            />
-          ) : (
-                <div
-                  className={`flex size-28 items-center justify-center rounded-full border-4 border-white bg-[#E6E9E5] text-3xl font-bold text-[#0F5A47] shadow-lg sm:size-32 ${
-                    isStudent ? "" : "ring-2 ring-[#0F5A47]"
+            {/* Avatar */}
+            <div className="-mt-16 sm:-mt-24 shrink-0 relative">
+              <div className="size-24 sm:size-32 overflow-hidden rounded-full border-4 border-card bg-muted/60 shadow-lg ring-2 ring-primary/20">
+                {profile.avatarUrl ? (
+                  <Image
+                    alt={profile.fullName ?? "Avatar"}
+                    className="size-full rounded-full object-cover"
+                    height={128}
+                    priority
+                    src={profile.avatarUrl}
+                    width={128}
+                  />
+                ) : (
+                  <div className="flex size-full items-center justify-center rounded-full bg-primary/10 text-2xl sm:text-3xl font-bold text-primary">
+                    {getInitials(profile.fullName)}
+                  </div>
+                )}
+              </div>
+
+              {/* Verified Shield Badge */}
+              <span className="absolute bottom-0 right-0 sm:bottom-1 sm:right-1 flex size-7 sm:size-8 items-center justify-center rounded-full border-2 border-card bg-primary text-white shadow">
+                <ShieldCheck className="size-3.5 sm:size-4" />
+              </span>
+            </div>
+
+            {/* Profile Info */}
+            <div className="min-w-0 space-y-2 flex-1">
+              <div className="flex flex-wrap items-center gap-2">
+                <span
+                  className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold ${
+                    isStudent
+                      ? "bg-blue-50 dark:bg-blue-950/50 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-900"
+                      : "bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-900"
                   }`}
                 >
-              {initials(profile.fullName)}
-            </div>
-          )}
-              {isStudent ? (
-                <span className="absolute ml-20 -mt-8 flex size-7 items-center justify-center rounded-full border-2 border-white bg-[#0F5A47] text-white">
-                  <ShieldCheck aria-hidden="true" className="size-4" />
+                  {isStudent ? (
+                    <GraduationCap className="size-3.5" />
+                  ) : (
+                    <BriefcaseBusiness className="size-3.5" />
+                  )}
+                  {isStudent ? "Verified Student" : "Alumni Mentor"}
                 </span>
-              ) : (
-                <span className="absolute ml-20 -mt-8 inline-flex min-h-7 items-center gap-1 rounded-full border border-white bg-[#0F5A47] px-2 text-xs font-semibold text-white shadow">
-                  <ShieldCheck aria-hidden="true" className="size-3" />
-                  Mentor
-                </span>
-              )}
-            </div>
 
-            <div className="min-w-0 space-y-3">
-            <div>
-                <div className="mb-2 flex flex-wrap gap-2">
-                  <span className="inline-flex min-h-7 items-center gap-1 rounded-full border border-[#BFC9C3] bg-[#F2F4F1] px-2.5 text-xs font-semibold capitalize text-[#3F4945]">
-                    {isStudent ? (
-                      <GraduationCap aria-hidden="true" className="size-3.5 text-[#0F5A47]" />
-                    ) : (
-                      <BriefcaseBusiness aria-hidden="true" className="size-3.5 text-[#0F5A47]" />
-                    )}
-                    {isStudent ? "Verified Student" : "Alumni Mentor"}
+                {profile.details.graduationYear ? (
+                  <span className="inline-flex items-center rounded-full border border-border/80 bg-muted/60 px-3 py-1 text-xs font-medium text-muted-foreground">
+                    Class of {profile.details.graduationYear}
                   </span>
-                  {profile.details.graduationYear ? (
-                    <span className="inline-flex min-h-7 items-center rounded-full border border-[#BFC9C3] bg-[#F8FAF7] px-2.5 text-xs font-semibold text-[#3F4945]">
-                      Class of {profile.details.graduationYear}
-                    </span>
-                  ) : null}
-                </div>
-                <h1 className="break-words text-3xl font-bold tracking-tight text-[#191C1B] sm:text-4xl">
-                {profile.fullName}
-              </h1>
-                <p className="mt-1 break-all text-sm font-medium text-[#747875]">
-                @{profile.username}
-              </p>
-                {subtitle ? (
-                  <p className="mt-2 text-base leading-7 text-[#3F4945] sm:text-lg">
-                    {subtitle}
-                  </p>
                 ) : null}
-            </div>
+              </div>
 
-            {academicLine ? (
-                <p className="flex items-start gap-2 text-sm leading-6 text-[#3F4945]">
-                  <MapPin
-                    className="mt-1 size-4 shrink-0 text-[#0F5A47]"
-                    aria-hidden="true"
-                  />
-                <span>{academicLine}</span>
-              </p>
-            ) : null}
+              <div>
+                <h1 className="break-words text-2xl sm:text-3xl font-bold tracking-tight text-foreground leading-tight">
+                  {profile.fullName}
+                </h1>
+                <p className="text-xs sm:text-sm text-muted-foreground">
+                  @{profile.username}
+                </p>
+              </div>
+
+              {subtitle ? (
+                <p className="break-words text-sm sm:text-base font-medium text-foreground/90 leading-relaxed">
+                  {subtitle}
+                </p>
+              ) : null}
+
+              {academicLine ? (
+                <p className="flex items-start gap-1.5 text-xs sm:text-sm text-muted-foreground break-words leading-relaxed">
+                  <MapPin className="size-4 shrink-0 text-primary mt-0.5" />
+                  <span>{academicLine}</span>
+                </p>
+              ) : null}
+
               {profile.skills.length > 0 ? (
-                <div className="flex flex-wrap gap-2">
-                  {profile.skills.slice(0, 3).map((skill) => (
+                <div className="flex flex-wrap gap-1.5 pt-1">
+                  {profile.skills.slice(0, 4).map((skill) => (
                     <SkillPill key={skill.id}>{skill.name}</SkillPill>
                   ))}
                 </div>
               ) : null}
+            </div>
           </div>
-        </div>
 
-        {profile.isOwner ? (
-            <div className="flex w-full flex-col gap-2 sm:w-auto">
-            <LinkButton
-                className="h-11 w-full border-[#0F5A47] text-[#0F5A47] sm:w-auto"
-              href="/profile/edit"
-              size="lg"
-              variant="outline"
-            >
-              <Edit3 aria-hidden="true" />
-              Edit profile
-            </LinkButton>
-            <LinkButton
-                className="h-11 w-full border-[#0F5A47] text-[#0F5A47] sm:w-auto"
-              href="/connections"
-              size="lg"
-              variant="outline"
-            >
-              <Users aria-hidden="true" />
-              Circles
-            </LinkButton>
-            <form action={signOutAction}>
+          {/* Action Buttons */}
+          {profile.isOwner ? (
+            <div className="flex w-full flex-col gap-2.5 sm:w-auto shrink-0 pt-2">
+              <LinkButton
+                className="h-11 sm:h-10 w-full rounded-full border border-primary text-primary hover:bg-primary/10 sm:w-auto font-semibold px-5 justify-center"
+                href="/profile/edit"
+                variant="outline"
+              >
+                <Edit3 className="size-4" />
+                <span>Edit Profile</span>
+              </LinkButton>
+              <LinkButton
+                className="h-11 sm:h-10 w-full rounded-full border border-border bg-card text-foreground hover:bg-muted sm:w-auto font-semibold px-5 justify-center"
+                href="/connections"
+                variant="outline"
+              >
+                <Users className="size-4" />
+                <span>My Circles</span>
+              </LinkButton>
               <Button
-                  className="h-11 w-full text-red-700 sm:w-auto"
-                size="lg"
-                type="submit"
+                className="h-11 sm:h-10 w-full rounded-full text-destructive hover:bg-destructive/10 sm:w-auto font-semibold justify-center cursor-pointer"
+                onClick={() => setShowLogoutModal(true)}
+                type="button"
                 variant="ghost"
               >
-                <LogOut aria-hidden="true" />
-                Logout
+                <LogOut className="size-4" />
+                <span>Logout</span>
               </Button>
-            </form>
-          </div>
-        ) : (
-            <div className="flex w-full flex-col gap-2 sm:w-auto">
+            </div>
+          ) : (
+            <div className="flex w-full flex-col gap-2.5 sm:w-auto shrink-0 pt-2">
               {connectionActions}
               {messageAction ?? (
                 <Button
-                  className="h-11 w-full border-[#1E293B] text-[#1E293B] opacity-60 sm:w-auto"
+                  className="h-11 sm:h-10 w-full rounded-full border border-border bg-card text-foreground opacity-60 sm:w-auto justify-center"
                   isDisabled
                   type="button"
                   variant="outline"
                 >
-                  <MessageCircle aria-hidden="true" />
-                  Message
+                  <MessageCircle className="size-4" />
+                  <span>Message</span>
                 </Button>
               )}
             </div>
-        )}
+          )}
         </div>
       </div>
+
+      <LogoutConfirmationModal
+        isOpen={showLogoutModal}
+        onClose={() => setShowLogoutModal(false)}
+      />
     </header>
   );
 }

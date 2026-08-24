@@ -6,24 +6,31 @@ export function ProfileSection({
   action,
   children,
   className,
+  description,
   title,
 }: {
   action?: ReactNode;
   children: ReactNode;
   className?: string;
+  description?: string;
   title: string;
 }) {
   return (
     <section
       className={cn(
-        "rounded-xl border border-[#BFC9C3] bg-white p-5 shadow-[0_4px_12px_rgba(30,41,59,0.04)] sm:p-6",
+        "rounded-[24px] border border-border/80 dark:border-slate-800 bg-card p-5 sm:p-6 card-shadow transition-colors duration-200",
         className
       )}
     >
-      <div className="mb-4 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-        <h2 className="text-lg font-bold tracking-tight text-[#191C1B] sm:text-xl">
-          {title}
-        </h2>
+      <div className="mb-4 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between border-b border-border/60 dark:border-slate-800/80 pb-3">
+        <div>
+          <h2 className="text-base sm:text-lg font-bold tracking-tight text-foreground">
+            {title}
+          </h2>
+          {description ? (
+            <p className="mt-0.5 text-xs text-muted-foreground">{description}</p>
+          ) : null}
+        </div>
         {action}
       </div>
       {children}

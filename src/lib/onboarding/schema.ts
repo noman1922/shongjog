@@ -27,9 +27,9 @@ const baseProfileSchema = z.object({
     .int("Graduation year must be a whole number.")
     .min(1950, "Enter a valid graduation year.")
     .max(currentYear + 10, "Graduation year is too far in the future."),
-  skillIds: z
-    .array(uuidField)
-    .max(15, "Choose up to 15 skills."),
+  skills: z
+    .array(z.string().trim().min(1).max(100))
+    .max(25, "Choose up to 25 skills."),
   bio: z
     .string()
     .trim()

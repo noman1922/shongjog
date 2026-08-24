@@ -8,6 +8,7 @@ import {
   type AlumniOnboardingInput,
   type StudentOnboardingInput,
 } from "@/lib/onboarding/schema";
+import { FALLBACK_DEPARTMENTS } from "@/lib/onboarding/options";
 import { createClient } from "@/lib/supabase/server";
 
 type ActionResult = {
@@ -63,6 +64,19 @@ async function validateAcademicSelection(
     .eq("university_id", universityId)
     .maybeSingle();
 
+  if (data) {
+    return null;
+  }
+
+  // Check fallback dataset if database record not found
+  const fallbackMatch = FALLBACK_DEPARTMENTS.find(
+    (d) => d.id === departmentId && d.university_id === universityId
+  );
+
+  if (fallbackMatch) {
+    return null;
+  }
+
   if (error || !data) {
     return "Please choose a department from the selected university.";
   }
@@ -70,14 +84,25 @@ async function validateAcademicSelection(
   return null;
 }
 
+function generateSkillSlug(name: string) {
+  const clean = name
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-|-$/g, "");
+  return clean || "skill";
+}
+
 async function replaceUserSkills(
   supabase: Awaited<ReturnType<typeof createClient>>,
   userId: string,
-  skillIds: string[]
+  skillsInput: string[] = []
 ) {
-  const uniqueSkillIds = Array.from(new Set(skillIds));
+  const cleanInputs = Array.from(
+    new Set(skillsInput.map((s) => s.trim()).filter((s) => s.length > 0))
+  );
 
-  if (uniqueSkillIds.length === 0) {
+  if (cleanInputs.length === 0) {
     const { error: deleteError } = await supabase
       .from("user_skills")
       .delete()
@@ -86,14 +111,67 @@ async function replaceUserSkills(
     return deleteError ? "Could not update your skills." : null;
   }
 
-  const { data: existingSkills, error: skillsError } = await supabase
-    .from("skills")
-    .select("id")
-    .in("id", uniqueSkillIds);
+  const isUuid = (str: string) =>
+    /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(str);
 
-  if (skillsError || (existingSkills?.length ?? 0) !== uniqueSkillIds.length) {
-    return "Please choose only existing skills.";
+  const resolvedSkillIds: string[] = [];
+
+  for (const item of cleanInputs) {
+    if (isUuid(item)) {
+      const { data: byId } = await supabase
+        .from("skills")
+        .select("id")
+        .eq("id", item)
+        .maybeSingle();
+
+      if (byId?.id) {
+        resolvedSkillIds.push(byId.id);
+        continue;
+      }
+    }
+
+    // Lookup by exact name (case-insensitive)
+    const { data: byName } = await supabase
+      .from("skills")
+      .select("id")
+      .ilike("name", item)
+      .maybeSingle();
+
+    if (byName?.id) {
+      resolvedSkillIds.push(byName.id);
+      continue;
+    }
+
+    // Insert new custom skill
+    const baseSlug = generateSkillSlug(item);
+    const slug = `${baseSlug.slice(0, 80)}-${Math.random().toString(36).slice(2, 6)}`;
+
+    const { data: created, error: createError } = await supabase
+      .from("skills")
+      .insert({
+        name: item.slice(0, 100),
+        slug,
+      })
+      .select("id")
+      .maybeSingle();
+
+    if (created?.id) {
+      resolvedSkillIds.push(created.id);
+    } else if (createError) {
+      // If collided, try finding it again
+      const { data: retryFind } = await supabase
+        .from("skills")
+        .select("id")
+        .ilike("name", item)
+        .maybeSingle();
+
+      if (retryFind?.id) {
+        resolvedSkillIds.push(retryFind.id);
+      }
+    }
   }
+
+  const uniqueSkillIds = Array.from(new Set(resolvedSkillIds));
 
   const { error: deleteError } = await supabase
     .from("user_skills")
@@ -104,15 +182,17 @@ async function replaceUserSkills(
     return "Could not update your skills.";
   }
 
-  const { error: insertError } = await supabase.from("user_skills").insert(
-    uniqueSkillIds.map((skillId) => ({
-      skill_id: skillId,
-      user_id: userId,
-    }))
-  );
+  if (uniqueSkillIds.length > 0) {
+    const { error: insertError } = await supabase.from("user_skills").insert(
+      uniqueSkillIds.map((skillId) => ({
+        skill_id: skillId,
+        user_id: userId,
+      }))
+    );
 
-  if (insertError) {
-    return "Could not save your skills.";
+    if (insertError) {
+      return "Could not save your skills.";
+    }
   }
 
   return null;
@@ -128,9 +208,17 @@ async function upsertBaseUser(
   values: Pick<StudentOnboardingInput, "bio" | "fullName" | "username">,
   role: "student" | "alumni"
 ) {
+  const { data: existingUser } = await supabase
+    .from("users")
+    .select("avatar_url")
+    .eq("id", user.id)
+    .maybeSingle();
+
+  const finalAvatarUrl = existingUser?.avatar_url || getAvatarUrl(user);
+
   const { error } = await supabase.from("users").upsert(
     {
-      avatar_url: getAvatarUrl(user),
+      avatar_url: finalAvatarUrl,
       bio: values.bio,
       email: getAuthEmail(user),
       full_name: values.fullName,
@@ -201,7 +289,9 @@ export async function submitStudentOnboarding(
     return { error: userError };
   }
 
-  const skillsError = await replaceUserSkills(supabase, user.id, values.skillIds);
+  const skillsToSave = values.skills ?? [];
+
+  const skillsError = await replaceUserSkills(supabase, user.id, skillsToSave);
   if (skillsError) {
     return { error: skillsError };
   }
@@ -262,7 +352,9 @@ export async function submitAlumniOnboarding(
     return { error: userError };
   }
 
-  const skillsError = await replaceUserSkills(supabase, user.id, values.skillIds);
+  const alumniSkillsToSave = values.skills ?? [];
+
+  const skillsError = await replaceUserSkills(supabase, user.id, alumniSkillsToSave);
   if (skillsError) {
     return { error: skillsError };
   }

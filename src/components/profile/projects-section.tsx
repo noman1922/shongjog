@@ -6,44 +6,47 @@ import type { ProfileProject } from "@/lib/profile/types";
 
 export function ProjectsSection({ projects }: { projects: ProfileProject[] }) {
   return (
-    <ProfileSection title="Projects">
+    <ProfileSection title="Featured Projects & Research">
       {projects.length > 0 ? (
-        <div className="grid gap-4 md:grid-cols-2">
+        <div className="grid gap-4 sm:grid-cols-2">
           {projects.map((project) => (
             <ProfileCard key={project.id}>
               <div className="space-y-3">
                 {project.imageUrl ? (
                   // eslint-disable-next-line @next/next/no-img-element
                   <img
-                    alt=""
-                    className="aspect-video w-full rounded-md border border-border object-cover"
+                    alt={project.title}
+                    className="aspect-video w-full rounded-xl border border-border/60 object-cover"
                     src={project.imageUrl}
                   />
                 ) : null}
+
                 <div className="space-y-2">
-                  <div className="flex items-start gap-3">
-                    <span className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-[#ECEEEB] text-[#0F5A47]">
-                      <FolderKanban aria-hidden="true" className="size-5" />
+                  <div className="flex items-start gap-2.5">
+                    <span className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
+                      <FolderKanban className="size-4" />
                     </span>
-                    <h3 className="break-words font-semibold text-[#191C1B]">
+                    <h3 className="break-words font-bold text-sm sm:text-base text-foreground leading-snug">
                       {project.title}
                     </h3>
                   </div>
+
                   {project.description ? (
-                    <p className="text-sm leading-6 text-[#3F4945]">
+                    <p className="text-xs sm:text-sm leading-relaxed text-muted-foreground line-clamp-3">
                       {project.description}
                     </p>
                   ) : null}
+
                   {project.projectUrl ? (
                     <a
-                      className="inline-flex min-h-10 items-center gap-1 rounded-lg border border-[#0F5A47] px-3 text-sm font-semibold text-[#0F5A47] underline-offset-4 hover:bg-[#0F5A47]/5"
+                      className="inline-flex min-h-9 items-center gap-1.5 rounded-full border border-primary/30 dark:border-primary/50 bg-primary/5 dark:bg-primary/15 px-3.5 text-xs font-semibold text-primary hover:bg-primary hover:text-white transition-colors"
                       href={project.projectUrl}
                       rel="noreferrer"
                       target="_blank"
                     >
-                      <Code2 className="size-4" aria-hidden="true" />
-                      View project
-                      <ExternalLink className="size-4" aria-hidden="true" />
+                      <Code2 className="size-3.5" />
+                      <span>View Project</span>
+                      <ExternalLink className="size-3.5" />
                     </a>
                   ) : null}
                 </div>
@@ -52,7 +55,7 @@ export function ProjectsSection({ projects }: { projects: ProfileProject[] }) {
           ))}
         </div>
       ) : (
-        <p className="text-sm text-[#747875]">No projects added yet.</p>
+        <p className="text-xs sm:text-sm text-muted-foreground">No projects added yet.</p>
       )}
     </ProfileSection>
   );

@@ -12,7 +12,7 @@ export function ProfileCard({
   return (
     <article
       className={cn(
-        "rounded-lg border border-[#BFC9C3]/80 bg-[#F8FAF7] p-4 transition hover:shadow-[0_10px_18px_rgba(30,41,59,0.08)]",
+        "rounded-2xl border border-border/80 dark:border-slate-800 bg-muted/40 dark:bg-slate-800/40 p-4 transition-all duration-200 hover:border-primary/40 hover:shadow-md",
         className
       )}
     >

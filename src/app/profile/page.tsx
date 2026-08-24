@@ -3,17 +3,15 @@ import { redirect } from "next/navigation";
 import { ProfileView } from "@/components/profile/profile-view";
 import { getOnboardingStatus } from "@/lib/onboarding/status";
 import { getOwnProfile } from "@/lib/profile/data";
-import { createClient } from "@/lib/supabase/server";
+import { getAuthUser } from "@/lib/supabase/server";
 
 export default async function ProfilePage() {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getAuthUser();
 
   if (!user) {
     redirect("/login?next=/profile");
   }
+
 
   const status = await getOnboardingStatus();
 

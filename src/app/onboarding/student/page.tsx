@@ -1,9 +1,11 @@
 import { redirect } from "next/navigation";
 
+import { StudentOnboardingForm } from "@/components/onboarding/student-onboarding-form";
+import { ShongjogBrand } from "@/components/shongjog/brand";
+import { ThemeToggle } from "@/components/shongjog/theme-toggle";
 import { getOnboardingOptions } from "@/lib/onboarding/options";
 import { getOnboardingStatus } from "@/lib/onboarding/status";
 import { createClient } from "@/lib/supabase/server";
-import { StudentOnboardingForm } from "@/app/onboarding/onboarding-form";
 
 export default async function StudentOnboardingPage() {
   const supabase = await createClient();
@@ -17,34 +19,53 @@ export default async function StudentOnboardingPage() {
 
   const status = await getOnboardingStatus();
 
+  if (status.role === "admin") {
+    redirect("/admin");
+  }
+
   if (status.completed) {
     redirect("/dashboard");
   }
 
-  const { departments, error, skills, universities } = await getOnboardingOptions();
+  const [{ departments, skills, universities }, { data: profile }] =
+    await Promise.all([
+      getOnboardingOptions(),
+      supabase
+        .from("users")
+        .select("full_name, username, avatar_url")
+        .eq("id", user.id)
+        .maybeSingle(),
+    ]);
 
-  if (error) {
-    return (
-      <main className="min-h-dvh bg-background px-4 py-8">
-        <section className="mx-auto max-w-xl rounded-lg border border-border p-5">
-          <h1 className="text-xl font-semibold">Onboarding is unavailable</h1>
-          <p className="mt-2 text-sm leading-6 text-muted-foreground">
-            We could not load universities, departments, or skills. Please try
-            again shortly.
-          </p>
-        </section>
-      </main>
-    );
-  }
+  const defaultValues = {
+    avatarUrl: profile?.avatar_url ?? null,
+    fullName:
+      profile?.full_name ??
+      (user.user_metadata?.full_name as string) ??
+      "",
+    username:
+      profile?.username ??
+      (user.user_metadata?.username as string) ??
+      "",
+  };
 
   return (
-    <main className="min-h-dvh bg-background">
-      <StudentOnboardingForm
-        departments={departments}
-        role="student"
-        skills={skills}
-        universities={universities}
-      />
+    <main className="min-h-dvh bg-background text-foreground px-4 py-6 sm:px-6 sm:py-10 transition-colors duration-200">
+      <div className="mx-auto flex w-full max-w-3xl flex-col gap-6 sm:gap-8">
+        {/* Top Header */}
+        <div className="flex items-center justify-between">
+          <ShongjogBrand href="/onboarding" variant="horizontal" />
+          <ThemeToggle />
+        </div>
+
+        {/* Student Form */}
+        <StudentOnboardingForm
+          defaultValues={defaultValues}
+          departments={departments}
+          skills={skills}
+          universities={universities}
+        />
+      </div>
     </main>
   );
 }

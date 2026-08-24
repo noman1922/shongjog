@@ -1,4 +1,4 @@
-import { BriefcaseBusiness } from "lucide-react";
+import { BriefcaseBusiness, Calendar } from "lucide-react";
 
 import { ProfileCard } from "@/components/profile/profile-card";
 import { ProfileSection } from "@/components/profile/profile-section";
@@ -16,30 +16,32 @@ export function ExperienceSection({
   experiences: ProfileExperience[];
 }) {
   return (
-    <ProfileSection title="Work experience">
+    <ProfileSection title="Work Experience">
       {experiences.length > 0 ? (
-        <div className="grid gap-4">
+        <div className="grid gap-3.5">
           {experiences.map((experience) => (
             <ProfileCard key={experience.id}>
               <div className="space-y-2">
                 <div className="flex items-start gap-3">
-                  <span className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-[#ECEEEB] text-[#0F5A47]">
-                    <BriefcaseBusiness aria-hidden="true" className="size-5" />
+                  <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
+                    <BriefcaseBusiness className="size-5" />
                   </span>
-                  <div>
-                    <h3 className="break-words font-semibold text-[#191C1B]">
+                  <div className="min-w-0 flex-1">
+                    <h3 className="break-words font-bold text-sm sm:text-base text-foreground">
                       {experience.position}
                     </h3>
-                    <p className="text-sm text-[#3F4945]">
-                    {experience.company}
+                    <p className="text-xs sm:text-sm font-medium text-muted-foreground">
+                      {experience.company}
+                    </p>
+                    <p className="flex items-center gap-1 text-[11px] font-medium text-primary mt-1">
+                      <Calendar className="size-3" />
+                      {formatRange(experience)}
                     </p>
                   </div>
                 </div>
-                <p className="text-xs font-medium uppercase text-[#747875]">
-                  {formatRange(experience)}
-                </p>
+
                 {experience.description ? (
-                  <p className="text-sm leading-6 text-[#3F4945]">
+                  <p className="text-xs sm:text-sm leading-relaxed text-muted-foreground pt-1">
                     {experience.description}
                   </p>
                 ) : null}
@@ -48,7 +50,7 @@ export function ExperienceSection({
           ))}
         </div>
       ) : (
-        <p className="text-sm text-[#747875]">
+        <p className="text-xs sm:text-sm text-muted-foreground">
           No professional experience added yet.
         </p>
       )}

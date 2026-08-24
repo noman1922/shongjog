@@ -47,6 +47,16 @@ export type ProfileDetails =
       universityName: string | null;
     };
 
+export type ViewerProfile = {
+  avatarUrl: string | null;
+  details: {
+    role: "student" | "alumni";
+  };
+  fullName: string | null;
+  id: string;
+  username: string | null;
+};
+
 export type PublicProfile = {
   avatarUrl: string | null;
   bio: string | null;
@@ -59,3 +69,4 @@ export type PublicProfile = {
   skills: ProfileSkill[];
   username: string | null;
 };
+

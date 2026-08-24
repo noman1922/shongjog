@@ -7,8 +7,8 @@ import { ProfileView } from "@/components/profile/profile-view";
 import { getProfileConnectionState } from "@/lib/connections/data";
 import {
   getAuthenticatedUserId,
-  getOwnProfile,
   getProfileByUsername,
+  getViewerProfile,
 } from "@/lib/profile/data";
 
 type PublicProfilePageProps = {
@@ -56,7 +56,7 @@ export default async function PublicProfilePage({
   }
 
   const connectionState = await getProfileConnectionState(viewerUserId, profile.id);
-  const shellProfile = await getOwnProfile();
+  const shellProfile = await getViewerProfile();
 
   return (
     <ProfileView

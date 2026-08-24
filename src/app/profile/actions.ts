@@ -430,8 +430,36 @@ export async function deleteExperienceAction(formData: FormData) {
   redirect("/profile/edit");
 }
 
+export async function updateAvatarUrlAction(avatarUrl: string): Promise<ActionState> {
+  const { error, profile, supabase, user } = await getOwnedProfile();
+
+  if (error || !profile || !user) {
+    return { error: error || "Unauthorized." };
+  }
+
+  const { error: dbError } = await supabase
+    .from("users")
+    .update({
+      avatar_url: avatarUrl,
+      updated_at: new Date().toISOString(),
+    })
+    .eq("id", user.id);
+
+  if (dbError) {
+    return { error: "Failed to update avatar." };
+  }
+
+  refreshProfilePages(profile.username);
+  revalidatePath("/dashboard");
+  revalidatePath("/discover");
+  revalidatePath("/connections");
+
+  return { success: "Avatar updated successfully." };
+}
+
 export async function signOutAction() {
   const supabase = await createClient();
   await supabase.auth.signOut();
   redirect("/");
 }
+

@@ -2,9 +2,14 @@ import {
   BriefcaseBusiness,
   Building2,
   CalendarDays,
+  CheckCircle2,
   GraduationCap,
+  Layers,
   School,
+  XCircle,
+  type LucideIcon,
 } from "lucide-react";
+import type { ComponentType } from "react";
 
 import { ProfileSection } from "@/components/profile/profile-section";
 import type { PublicProfile } from "@/lib/profile/types";
@@ -12,108 +17,122 @@ import type { PublicProfile } from "@/lib/profile/types";
 function DetailItem({
   label,
   value,
+  icon: Icon,
 }: {
   label: string;
   value: number | string | null | undefined;
+  icon?: LucideIcon | ComponentType<{ className?: string }>;
 }) {
   if (value === null || value === undefined || value === "") {
     return null;
   }
 
   return (
-    <div className="space-y-1 rounded-lg border border-[#BFC9C3]/50 bg-[#F8FAF7] p-3">
-      <p className="text-xs font-semibold uppercase tracking-wide text-[#747875]">
+    <div className="space-y-1 rounded-2xl border border-border/70 dark:border-slate-800 bg-muted/40 dark:bg-slate-800/40 p-3.5">
+      <p className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
         {label}
       </p>
-      <p className="text-sm leading-6 text-[#191C1B]">{value}</p>
+      <p className="flex items-center gap-2 text-sm font-semibold text-foreground">
+        {Icon ? <Icon className="size-4 text-primary shrink-0" /> : null}
+        <span className="break-words leading-snug min-w-0">{value}</span>
+      </p>
     </div>
   );
 }
 
 export function ProfileAbout({ profile }: { profile: PublicProfile }) {
+  const { details } = profile;
+  const isStudent = details.role === "student";
+
   return (
-    <ProfileSection title="About">
+    <ProfileSection title="About & Background">
       <div className="space-y-5">
-        <p className="text-sm leading-6 text-[#3F4945]">
-          {profile.bio || "No bio added yet."}
+        <p className="text-sm leading-relaxed text-foreground/90">
+          {profile.bio || "No professional summary added yet."}
         </p>
 
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-3.5 sm:grid-cols-2 lg:grid-cols-3">
           <DetailItem
+            icon={School}
             label="University"
-            value={profile.details.universityName}
+            value={details.universityName}
           />
           <DetailItem
+            icon={Building2}
             label="Department"
-            value={profile.details.departmentName}
+            value={details.departmentName}
           />
           <DetailItem
-            label="Graduation year"
-            value={profile.details.graduationYear}
+            icon={CalendarDays}
+            label="Graduation Year"
+            value={details.graduationYear}
           />
 
-          {profile.details.role === "student" ? (
+          {details.role === "student" ? (
             <>
-              <div className="space-y-1">
-                <p className="text-xs font-semibold uppercase tracking-wide text-[#747875]">
-                  Internship availability
+              <div className="space-y-1 rounded-2xl border border-border/70 dark:border-slate-800 bg-muted/40 dark:bg-slate-800/40 p-3.5">
+                <p className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
+                  Internship Status
                 </p>
-                <p className="flex items-center gap-2 text-sm leading-6 text-[#191C1B]">
-                  <GraduationCap
-                    className="size-4 text-[#0F5A47]"
-                    aria-hidden="true"
-                  />
-                  {profile.details.internshipAvailable ? "Available" : "Not available"}
+                <p className="flex items-center gap-1.5 text-sm font-semibold text-foreground">
+                  {details.internshipAvailable ? (
+                    <>
+                      <CheckCircle2 className="size-4 text-emerald-500" />
+                      <span className="text-emerald-600 dark:text-emerald-400">Available</span>
+                    </>
+                  ) : (
+                    <>
+                      <XCircle className="size-4 text-muted-foreground" />
+                      <span className="text-muted-foreground">Not looking</span>
+                    </>
+                  )}
                 </p>
               </div>
               <DetailItem
-                label="Availability description"
-                value={profile.details.availabilityText}
+                label="Availability Info"
+                value={details.availabilityText}
               />
             </>
           ) : (
             <>
-              <DetailItem label="Company" value={profile.details.companyName} />
-              <DetailItem label="Job title" value={profile.details.jobTitle} />
               <DetailItem
-                label="Professional field"
-                value={profile.details.professionalField}
+                icon={Building2}
+                label="Company"
+                value={details.companyName}
               />
-              <div className="space-y-1">
-                <p className="text-xs font-semibold uppercase tracking-wide text-[#747875]">
-                  Years of experience
-                </p>
-                <p className="flex items-center gap-2 text-sm leading-6 text-[#191C1B]">
-                  <BriefcaseBusiness
-                    className="size-4 text-[#0F5A47]"
-                    aria-hidden="true"
-                  />
-                  {profile.details.experienceYears ?? 0}
-                </p>
-              </div>
+              <DetailItem
+                icon={BriefcaseBusiness}
+                label="Job Title"
+                value={details.jobTitle}
+              />
+              <DetailItem
+                icon={Layers}
+                label="Professional Field"
+                value={details.professionalField}
+              />
+              <DetailItem
+                label="Experience"
+                value={
+                  details.experienceYears !== null &&
+                  details.experienceYears !== undefined
+                    ? `${details.experienceYears} years`
+                    : null
+                }
+              />
             </>
           )}
 
-          <div className="space-y-1">
-            <p className="text-xs font-semibold uppercase tracking-wide text-[#747875]">
-              Member type
+          <div className="space-y-1 rounded-2xl border border-border/70 dark:border-slate-800 bg-muted/40 dark:bg-slate-800/40 p-3.5">
+            <p className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
+              Member Category
             </p>
-            <p className="flex items-center gap-2 text-sm capitalize leading-6 text-[#191C1B]">
-              {profile.details.role === "student" ? (
-                <School className="size-4 text-[#0F5A47]" aria-hidden="true" />
+            <p className="flex items-center gap-2 text-sm font-semibold capitalize text-foreground">
+              {isStudent ? (
+                <GraduationCap className="size-4 text-primary" />
               ) : (
-                <Building2 className="size-4 text-[#0F5A47]" aria-hidden="true" />
+                <BriefcaseBusiness className="size-4 text-primary" />
               )}
-              {profile.details.role}
-            </p>
-          </div>
-          <div className="space-y-1 rounded-lg border border-[#BFC9C3]/50 bg-[#F8FAF7] p-3">
-            <p className="text-xs font-semibold uppercase tracking-wide text-[#747875]">
-              Graduation
-            </p>
-            <p className="flex items-center gap-2 text-sm leading-6 text-[#191C1B]">
-              <CalendarDays className="size-4 text-[#0F5A47]" aria-hidden="true" />
-              {profile.details.graduationYear ?? "Not set"}
+              {details.role}
             </p>
           </div>
         </div>

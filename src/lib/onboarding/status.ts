@@ -20,13 +20,46 @@ export const getOnboardingStatus = cache(async (): Promise<OnboardingStatus> => 
   const supabase = await createClient();
 
   // 1. Fetch user base record
-  const { data: userRecord, error: userError } = await supabase
+  let { data: userRecord } = await supabase
     .from("users")
     .select("id, role")
     .eq("id", user.id)
     .maybeSingle();
 
-  if (userError || !userRecord) {
+  // If user exists in Auth but missing from public.users, create/sync fallback record
+  if (!userRecord && user) {
+    const rawRole = user.user_metadata?.role;
+    const role = rawRole === "alumni" || rawRole === "admin" ? rawRole : "student";
+    const fullName =
+      user.user_metadata?.full_name ||
+      user.user_metadata?.name ||
+      user.email?.split("@")[0] ||
+      "Member";
+    const username =
+      user.user_metadata?.username ||
+      user.email?.split("@")[0] ||
+      `user_${user.id.slice(0, 8)}`;
+
+    const { data: insertedUser } = await supabase
+      .from("users")
+      .upsert(
+        {
+          email: user.email,
+          full_name: fullName,
+          id: user.id,
+          is_active: true,
+          role,
+          username,
+        },
+        { onConflict: "id" }
+      )
+      .select("id, role")
+      .maybeSingle();
+
+    userRecord = insertedUser;
+  }
+
+  if (!userRecord) {
     return { completed: false, isOnboarded: false, role: null };
   }
 

@@ -1,8 +1,9 @@
+import { ArrowRight, GraduationCap, UserRoundCheck } from "lucide-react";
 import Link from "next/link";
-import { GraduationCap, UserRoundCheck } from "lucide-react";
 import { redirect } from "next/navigation";
 
-import { Button } from "@/components/ui/button";
+import { ShongjogBrand } from "@/components/shongjog/brand";
+import { ThemeToggle } from "@/components/shongjog/theme-toggle";
 import { getOnboardingStatus } from "@/lib/onboarding/status";
 import { createClient } from "@/lib/supabase/server";
 
@@ -18,67 +19,87 @@ export default async function OnboardingPage() {
 
   const status = await getOnboardingStatus();
 
+  if (status.role === "admin") {
+    redirect("/admin");
+  }
+
   if (status.completed) {
     redirect("/dashboard");
   }
 
   return (
-    <main className="min-h-dvh bg-background px-4 py-6 sm:px-6 sm:py-10">
-      <section className="mx-auto flex w-full max-w-4xl flex-col gap-8">
-        <div className="max-w-2xl space-y-3">
-          <p className="text-sm font-medium text-muted-foreground">Shongjog</p>
-          <h1 className="text-3xl font-semibold tracking-tight sm:text-4xl">
+    <main className="min-h-dvh bg-background text-foreground px-4 py-8 sm:px-6 sm:py-12 transition-colors duration-200">
+      <div className="mx-auto flex w-full max-w-4xl flex-col gap-8">
+        {/* Top brand header */}
+        <div className="flex items-center justify-between">
+          <ShongjogBrand href="/onboarding" variant="horizontal" />
+          <ThemeToggle />
+        </div>
+
+        <div className="max-w-2xl space-y-2 pt-2">
+          <span className="inline-block rounded-full bg-primary/10 px-3.5 py-1 text-xs font-bold text-primary">
+            Welcome to Shongjog
+          </span>
+          <h1 className="text-3xl sm:text-4xl font-bold tracking-tight text-foreground">
             Choose your profile type
           </h1>
-          <p className="text-sm leading-6 text-muted-foreground sm:text-base">
-            Pick the path that matches how you will use the university network.
+          <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
+            Select how you would like to participate in the university network.
           </p>
         </div>
 
-        <div className="grid gap-4 md:grid-cols-2">
+        <div className="grid gap-6 md:grid-cols-2">
+          {/* Student Card */}
           <Link
-            className="group flex min-h-56 flex-col justify-between rounded-lg border border-border p-5 transition hover:border-foreground/30 hover:bg-muted/40"
+            className="group flex flex-col justify-between rounded-[24px] border border-border/80 dark:border-slate-800 bg-card p-6 sm:p-8 card-shadow transition-all duration-200 hover:border-primary hover:shadow-lg"
             href="/onboarding/student"
           >
-            <span className="space-y-4">
-              <span className="flex size-11 items-center justify-center rounded-md bg-primary text-primary-foreground">
-                <GraduationCap aria-hidden="true" />
-              </span>
-              <span className="block space-y-2">
-                <span className="block text-xl font-semibold">Student</span>
-                <span className="block text-sm leading-6 text-muted-foreground">
-                  Build a profile around your university, department, skills,
-                  graduation year, and internship availability.
-                </span>
-              </span>
-            </span>
-            <Button className="mt-6 h-11 w-full sm:w-fit" size="lg">
-              Continue as Student
-            </Button>
+            <div className="space-y-4">
+              <div className="flex size-14 items-center justify-center rounded-2xl bg-primary/10 text-primary group-hover:bg-primary group-hover:text-white transition-colors shadow-sm">
+                <GraduationCap className="size-7" />
+              </div>
+              <div className="space-y-1.5">
+                <h2 className="text-xl font-bold text-foreground group-hover:text-primary transition-colors">
+                  University Student
+                </h2>
+                <p className="text-xs sm:text-sm leading-relaxed text-muted-foreground">
+                  Build your academic profile, showcase projects, list technical skills, and connect with alumni mentors for internships and advice.
+                </p>
+              </div>
+            </div>
+
+            <div className="mt-8 flex items-center justify-between text-sm font-semibold text-primary">
+              <span>Continue as Student</span>
+              <ArrowRight className="size-4 group-hover:translate-x-1 transition-transform" />
+            </div>
           </Link>
 
+          {/* Alumni Card */}
           <Link
-            className="group flex min-h-56 flex-col justify-between rounded-lg border border-border p-5 transition hover:border-foreground/30 hover:bg-muted/40"
+            className="group flex flex-col justify-between rounded-[24px] border border-border/80 dark:border-slate-800 bg-card p-6 sm:p-8 card-shadow transition-all duration-200 hover:border-emerald-500 hover:shadow-lg"
             href="/onboarding/alumni"
           >
-            <span className="space-y-4">
-              <span className="flex size-11 items-center justify-center rounded-md bg-secondary text-secondary-foreground">
-                <UserRoundCheck aria-hidden="true" />
-              </span>
-              <span className="block space-y-2">
-                <span className="block text-xl font-semibold">Alumni</span>
-                <span className="block text-sm leading-6 text-muted-foreground">
-                  Share your professional background, company, field, and skills
-                  to help students discover you.
-                </span>
-              </span>
-            </span>
-            <Button className="mt-6 h-11 w-full sm:w-fit" size="lg" variant="outline">
-              Continue as Alumni
-            </Button>
+            <div className="space-y-4">
+              <div className="flex size-14 items-center justify-center rounded-2xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 group-hover:bg-emerald-600 group-hover:text-white transition-colors shadow-sm">
+                <UserRoundCheck className="size-7" />
+              </div>
+              <div className="space-y-1.5">
+                <h2 className="text-xl font-bold text-foreground group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
+                  Alumni Mentor
+                </h2>
+                <p className="text-xs sm:text-sm leading-relaxed text-muted-foreground">
+                  Share your career experience, current company, domain expertise, and guide younger peers entering the professional landscape.
+                </p>
+              </div>
+            </div>
+
+            <div className="mt-8 flex items-center justify-between text-sm font-semibold text-emerald-600 dark:text-emerald-400">
+              <span>Continue as Alumni</span>
+              <ArrowRight className="size-4 group-hover:translate-x-1 transition-transform" />
+            </div>
           </Link>
         </div>
-      </section>
+      </div>
     </main>
   );
 }
