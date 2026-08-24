@@ -180,3 +180,19 @@ export const getConnectionsOverview = cache(async (): Promise<ConnectionsOvervie
 
   return overview;
 });
+
+export const getPendingConnectionCount = cache(async (): Promise<number> => {
+  const { error, supabase, user } = await getAuthenticatedUser();
+
+  if (error || !user) {
+    return 0;
+  }
+
+  const { count } = await supabase
+    .from("connections")
+    .select("id", { count: "exact", head: true })
+    .eq("receiver_id", user.id)
+    .eq("status", "pending");
+
+  return count ?? 0;
+});

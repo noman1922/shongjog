@@ -14,31 +14,6 @@ import { createClient } from "@/lib/supabase/server";
 
 type Role = "student" | "alumni" | "admin";
 
-type DbUser = {
-  avatar_url: string | null;
-  bio: string | null;
-  full_name: string | null;
-  id: string;
-  role: Role;
-  username: string | null;
-};
-
-type DbAcademicProfile = {
-  department_id: string | null;
-  graduation_year: number | null;
-  university_id: string | null;
-  user_id: string;
-};
-
-type DbProject = {
-  description: string | null;
-  id: string;
-  image_url: string | null;
-  project_url: string | null;
-  title: string;
-  user_id: string;
-};
-
 export type DiscoverPerson = {
   avatarUrl: string | null;
   bio: string | null;
@@ -81,135 +56,99 @@ export type DiscoverResults = {
   research: [];
 };
 
-async function getAcademicProfiles(userIds: string[]) {
-  if (userIds.length === 0) {
-    return new Map<string, DbAcademicProfile>();
+const RELATIONAL_DISCOVER_USER_SELECT = `
+  id,
+  role,
+  full_name,
+  username,
+  avatar_url,
+  bio,
+  student_profiles (
+    university_id,
+    department_id,
+    graduation_year,
+    universities (name),
+    departments (name)
+  ),
+  alumni_profiles (
+    university_id,
+    department_id,
+    graduation_year,
+    company_name,
+    job_title,
+    professional_field,
+    experience_years,
+    universities (name),
+    departments (name)
+  ),
+  user_skills (
+    skills (id, name)
+  ),
+  projects (
+    id
+  )
+`;
+
+type DiscoverRelationalUser = {
+  avatar_url: string | null;
+  bio: string | null;
+  full_name: string | null;
+  id: string;
+  role: Role;
+  username: string | null;
+  student_profiles:
+    | {
+        department_id: string | null;
+        departments: { name: string } | { name: string }[] | null;
+        graduation_year: number | null;
+        universities: { name: string } | { name: string }[] | null;
+        university_id: string | null;
+      }
+    | {
+        department_id: string | null;
+        departments: { name: string } | { name: string }[] | null;
+        graduation_year: number | null;
+        universities: { name: string } | { name: string }[] | null;
+        university_id: string | null;
+      }[]
+    | null;
+  alumni_profiles:
+    | {
+        company_name: string | null;
+        department_id: string | null;
+        departments: { name: string } | { name: string }[] | null;
+        experience_years: number | null;
+        graduation_year: number | null;
+        job_title: string | null;
+        professional_field: string | null;
+        universities: { name: string } | { name: string }[] | null;
+        university_id: string | null;
+      }
+    | {
+        company_name: string | null;
+        department_id: string | null;
+        departments: { name: string } | { name: string }[] | null;
+        experience_years: number | null;
+        graduation_year: number | null;
+        job_title: string | null;
+        professional_field: string | null;
+        universities: { name: string } | { name: string }[] | null;
+        university_id: string | null;
+      }[]
+    | null;
+  user_skills:
+    | {
+        skills: { id: string; name: string } | { id: string; name: string }[] | null;
+      }[]
+    | null;
+  projects: { id: string }[] | null;
+};
+
+function extractRelation<T>(value: T | T[] | null | undefined): T | null {
+  if (!value) {
+    return null;
   }
-
-  const supabase = await createClient();
-  const [students, alumni] = await Promise.all([
-    supabase
-      .from("student_profiles")
-      .select("user_id, university_id, department_id, graduation_year")
-      .in("user_id", userIds),
-    supabase
-      .from("alumni_profiles")
-      .select("user_id, university_id, department_id, graduation_year")
-      .in("user_id", userIds),
-  ]);
-
-  const profiles = new Map<string, DbAcademicProfile>();
-  ((students.data ?? []) as DbAcademicProfile[]).forEach((profile) =>
-    profiles.set(profile.user_id, profile)
-  );
-  ((alumni.data ?? []) as DbAcademicProfile[]).forEach((profile) =>
-    profiles.set(profile.user_id, profile)
-  );
-
-  return profiles;
-}
-
-async function getNames(academicProfiles: Map<string, DbAcademicProfile>) {
-  const supabase = await createClient();
-  const universityIds = Array.from(
-    new Set(
-      Array.from(academicProfiles.values())
-        .map((profile) => profile.university_id)
-        .filter(Boolean) as string[]
-    )
-  );
-  const departmentIds = Array.from(
-    new Set(
-      Array.from(academicProfiles.values())
-        .map((profile) => profile.department_id)
-        .filter(Boolean) as string[]
-    )
-  );
-
-  const [universities, departments] = await Promise.all([
-    universityIds.length
-      ? supabase.from("universities").select("id, name").in("id", universityIds)
-      : Promise.resolve({ data: [] }),
-    departmentIds.length
-      ? supabase.from("departments").select("id, name").in("id", departmentIds)
-      : Promise.resolve({ data: [] }),
-  ]);
-
-  return {
-    departments: new Map(
-      ((departments.data ?? []) as { id: string; name: string }[]).map((item) => [
-        item.id,
-        item.name,
-      ])
-    ),
-    universities: new Map(
-      ((universities.data ?? []) as { id: string; name: string }[]).map((item) => [
-        item.id,
-        item.name,
-      ])
-    ),
-  };
-}
-
-async function getSkillNamesByUser(userIds: string[]) {
-  if (userIds.length === 0) {
-    return new Map<string, string[]>();
-  }
-
-  const supabase = await createClient();
-  const { data: userSkills } = await supabase
-    .from("user_skills")
-    .select("user_id, skill_id")
-    .in("user_id", userIds);
-  const skillIds = Array.from(
-    new Set((userSkills ?? []).map((userSkill) => userSkill.skill_id))
-  );
-
-  if (skillIds.length === 0) {
-    return new Map();
-  }
-
-  const { data: skills } = await supabase
-    .from("skills")
-    .select("id, name")
-    .in("id", skillIds);
-  const skillNames = new Map(
-    ((skills ?? []) as { id: string; name: string }[]).map((skill) => [
-      skill.id,
-      skill.name,
-    ])
-  );
-  const byUser = new Map<string, string[]>();
-
-  (userSkills ?? []).forEach((userSkill) => {
-    const name = skillNames.get(userSkill.skill_id);
-
-    if (name) {
-      byUser.set(userSkill.user_id, [...(byUser.get(userSkill.user_id) ?? []), name]);
-    }
-  });
-
-  return byUser;
-}
-
-async function getProjectCounts(userIds: string[]) {
-  if (userIds.length === 0) {
-    return new Map<string, number>();
-  }
-
-  const supabase = await createClient();
-  const { data } = await supabase
-    .from("projects")
-    .select("user_id")
-    .in("user_id", userIds)
-    .limit(200);
-  const counts = new Map<string, number>();
-
-  (data ?? []).forEach((project) => {
-    counts.set(project.user_id, (counts.get(project.user_id) ?? 0) + 1);
-  });
-
-  return counts;
+  return Array.isArray(value) ? value[0] ?? null : value;
 }
 
 async function getConnectionStates(
@@ -221,26 +160,17 @@ async function getConnectionStates(
   }
 
   const supabase = await createClient();
-  const [outgoing, incoming] = await Promise.all([
-    supabase
-      .from("connections")
-      .select("id, requester_id, receiver_id, status")
-      .eq("requester_id", viewerId)
-      .in("receiver_id", userIds)
-      .in("status", ["pending", "accepted"]),
-    supabase
-      .from("connections")
-      .select("id, requester_id, receiver_id, status")
-      .eq("receiver_id", viewerId)
-      .in("requester_id", userIds)
-      .in("status", ["pending", "accepted"]),
-  ]);
-  const states = new Map<string, ProfileConnectionState>();
+  const { data } = await supabase
+    .from("connections")
+    .select("id, requester_id, receiver_id, status")
+    .or(`requester_id.eq.${viewerId},receiver_id.eq.${viewerId}`)
+    .in("status", ["pending", "accepted"]);
 
+  const states = new Map<string, ProfileConnectionState>();
   userIds.forEach((userId) => states.set(userId, { kind: "none" }));
   states.set(viewerId, { kind: "self" });
 
-  [...(outgoing.data ?? []), ...(incoming.data ?? [])].forEach((connection) => {
+  (data ?? []).forEach((connection) => {
     const otherId =
       connection.requester_id === viewerId
         ? connection.receiver_id
@@ -271,71 +201,6 @@ async function getConnectionStates(
   return states;
 }
 
-async function getRoleLines(userIds: string[]) {
-  if (userIds.length === 0) {
-    return new Map<string, string | null>();
-  }
-
-  const supabase = await createClient();
-  const [students, alumni] = await Promise.all([
-    supabase
-      .from("student_profiles")
-      .select("user_id, graduation_year")
-      .in("user_id", userIds),
-    supabase
-      .from("alumni_profiles")
-      .select("user_id, company_name, job_title, professional_field, experience_years")
-      .in("user_id", userIds),
-  ]);
-  const lines = new Map<string, string | null>();
-
-  ((students.data ?? []) as { graduation_year: number | null; user_id: string }[])
-    .forEach((profile) =>
-      lines.set(
-        profile.user_id,
-        profile.graduation_year ? `Student • Class of ${profile.graduation_year}` : "Student"
-      )
-    );
-  ((alumni.data ?? []) as {
-    company_name: string | null;
-    experience_years: number | null;
-    job_title: string | null;
-    professional_field: string | null;
-    user_id: string;
-  }[]).forEach((profile) =>
-    lines.set(
-      profile.user_id,
-      [profile.job_title, profile.company_name].filter(Boolean).join(" at ") ||
-        profile.professional_field ||
-        (profile.experience_years !== null
-          ? `${profile.experience_years} years experience`
-          : "Alumni")
-    )
-  );
-
-  return lines;
-}
-
-async function getAuthors(userIds: string[]) {
-  if (userIds.length === 0) {
-    return new Map<string, { fullName: string | null; username: string | null }>();
-  }
-
-  const supabase = await createClient();
-  const { data } = await supabase
-    .from("users")
-    .select("id, full_name, username")
-    .in("id", Array.from(new Set(userIds)));
-
-  return new Map(
-    ((data ?? []) as { full_name: string | null; id: string; username: string | null }[])
-      .map((user) => [
-        user.id,
-        { fullName: user.full_name, username: user.username },
-      ])
-  );
-}
-
 export const searchDiscover = cache(
   async (rawQuery: string): Promise<DiscoverResults> => {
     const { patterns, query } = getSearchTerms(rawQuery);
@@ -352,13 +217,11 @@ export const searchDiscover = cache(
       directUsers,
       matchedSkills,
       matchedProjects,
-      matchedExperiences,
-      matchedAlumniProfiles,
       opportunities,
     ] = await Promise.all([
       supabase
         .from("users")
-        .select("id, role, full_name, username, avatar_url, bio")
+        .select(RELATIONAL_DISCOVER_USER_SELECT)
         .neq("role", "admin")
         .or(buildIlikeOr(["full_name", "username", "bio"], patterns))
         .limit(30),
@@ -366,24 +229,14 @@ export const searchDiscover = cache(
         .from("skills")
         .select("id, name")
         .or(buildIlikeOr(["name"], patterns))
-        .limit(20),
+        .limit(15),
       supabase
         .from("projects")
-        .select("id, user_id, title, description, project_url, image_url")
+        .select(
+          "id, user_id, title, description, project_url, image_url, users(id, full_name, username)"
+        )
         .or(buildIlikeOr(["title", "description"], patterns))
         .limit(10),
-      supabase
-        .from("experiences")
-        .select("user_id")
-        .or(buildIlikeOr(["company", "position", "description"], patterns))
-        .limit(30),
-      supabase
-        .from("alumni_profiles")
-        .select("user_id")
-        .or(
-          buildIlikeOr(["company_name", "job_title", "professional_field"], patterns)
-        )
-        .limit(30),
       supabase
         .from("opportunities")
         .select("id, type, title, company_name, location, deadline")
@@ -393,8 +246,13 @@ export const searchDiscover = cache(
         .limit(10),
     ]);
 
-    ((directUsers.data ?? []) as DbUser[]).forEach((user) =>
-      addScore(scores, user.id, 30, "Profile match")
+    const userMap = new Map<string, DiscoverRelationalUser>();
+
+    ((directUsers.data ?? []) as unknown as DiscoverRelationalUser[]).forEach(
+      (user) => {
+        userMap.set(user.id, user);
+        addScore(scores, user.id, 30, "Profile match");
+      }
     );
 
     const skillIds = (matchedSkills.data ?? []).map((skill) => skill.id);
@@ -403,104 +261,123 @@ export const searchDiscover = cache(
         .from("user_skills")
         .select("user_id")
         .in("skill_id", skillIds)
-        .limit(80);
+        .limit(50);
 
       (userSkills ?? []).forEach((userSkill) =>
         addScore(scores, userSkill.user_id, 40, "Skill match")
       );
     }
 
-    ((matchedProjects.data ?? []) as DbProject[]).forEach((project) =>
-      addScore(scores, project.user_id, 28, "Project match")
-    );
-    (matchedExperiences.data ?? []).forEach((experience) =>
-      addScore(scores, experience.user_id, 26, "Experience match")
-    );
-    (matchedAlumniProfiles.data ?? []).forEach((profile) =>
-      addScore(scores, profile.user_id, 26, "Experience match")
-    );
+    type ProjectWithAuthor = {
+      description: string | null;
+      id: string;
+      image_url: string | null;
+      project_url: string | null;
+      title: string;
+      user_id: string;
+      users:
+        | { full_name: string | null; id: string; username: string | null }
+        | { full_name: string | null; id: string; username: string | null }[]
+        | null;
+    };
 
-    const userIds = Array.from(scores.keys()).slice(0, 80);
-    const projectAuthors = await getAuthors(
-      ((matchedProjects.data ?? []) as DbProject[]).map((project) => project.user_id)
-    );
+    const projectList = (matchedProjects.data ?? []) as unknown as ProjectWithAuthor[];
+    projectList.forEach((project) => {
+      addScore(scores, project.user_id, 28, "Project match");
+    });
 
-    if (userIds.length === 0) {
-      return {
-        opportunities: ((opportunities.data ?? []) as {
-          company_name: string;
-          deadline: string | null;
-          id: string;
-          location: string | null;
-          title: string;
-          type: string;
-        }[]).map((opportunity) => ({
-          companyName: opportunity.company_name,
-          deadline: opportunity.deadline,
-          id: opportunity.id,
-          location: opportunity.location,
-          title: opportunity.title,
-          type: opportunity.type,
-        })),
-        people: [],
-        projects: ((matchedProjects.data ?? []) as DbProject[]).map((project) => {
-          const author = projectAuthors.get(project.user_id);
-          return {
-            authorName: author?.fullName ?? null,
-            authorUsername: author?.username ?? null,
-            description: project.description,
-            id: project.id,
-            projectUrl: project.project_url,
-            title: project.title,
-          };
-        }),
-        query,
-        research: [],
-      };
+    const allUserIds = Array.from(scores.keys()).slice(0, 50);
+    const missingUserIds = allUserIds.filter((id) => !userMap.has(id));
+
+    if (missingUserIds.length > 0) {
+      const { data: hydratedUsers } = await supabase
+        .from("users")
+        .select(RELATIONAL_DISCOVER_USER_SELECT)
+        .neq("role", "admin")
+        .in("id", missingUserIds);
+
+      ((hydratedUsers ?? []) as unknown as DiscoverRelationalUser[]).forEach(
+        (user) => {
+          userMap.set(user.id, user);
+        }
+      );
     }
 
-    const [
-      { data: users },
-      academicProfiles,
-      skillsByUser,
-      projectCounts,
-      connectionStates,
-      roleLines,
-    ] = await Promise.all([
-      supabase
-        .from("users")
-        .select("id, role, full_name, username, avatar_url, bio")
-        .neq("role", "admin")
-        .in("id", userIds),
-      getAcademicProfiles(userIds),
-      getSkillNamesByUser(userIds),
-      getProjectCounts(userIds),
-      ownProfile ? getConnectionStates(ownProfile.id, userIds) : Promise.resolve(new Map()),
-      getRoleLines(userIds),
-    ]);
-    const names = await getNames(academicProfiles);
+    const candidateUsers = Array.from(userMap.values()).filter(
+      (user): user is DiscoverRelationalUser & { role: "student" | "alumni" } =>
+        user.role !== "admin"
+    );
 
-    const people = ((users ?? []) as DbUser[])
-      .filter(
-        (user): user is DbUser & { role: "student" | "alumni" } =>
-          user.role !== "admin"
-      )
+    const connectionStates = ownProfile
+      ? await getConnectionStates(
+          ownProfile.id,
+          candidateUsers.map((u) => u.id)
+        )
+      : new Map<string, ProfileConnectionState>();
+
+    const people: DiscoverPerson[] = candidateUsers
       .map((user) => {
-        const academicProfile = academicProfiles.get(user.id);
-        const score = scores.get(user.id) ?? { reasons: new Set<string>(), score: 0 };
-        const skills = skillsByUser.get(user.id) ?? [];
+        const isStudent = user.role === "student";
+        const student = isStudent
+          ? extractRelation(user.student_profiles)
+          : null;
+        const alumni = !isStudent
+          ? extractRelation(user.alumni_profiles)
+          : null;
+
+        const university = isStudent
+          ? extractRelation(student?.universities)
+          : extractRelation(alumni?.universities);
+        const department = isStudent
+          ? extractRelation(student?.departments)
+          : extractRelation(alumni?.departments);
+
+        const universityId = isStudent
+          ? student?.university_id ?? null
+          : alumni?.university_id ?? null;
+        const departmentId = isStudent
+          ? student?.department_id ?? null
+          : alumni?.department_id ?? null;
+
+        const universityName = university?.name ?? null;
+        const departmentName = department?.name ?? null;
+
+        let roleLine: string | null = null;
+        if (isStudent) {
+          roleLine = student?.graduation_year
+            ? `Student • Class of ${student.graduation_year}`
+            : "Student";
+        } else if (alumni) {
+          roleLine =
+            [alumni.job_title, alumni.company_name].filter(Boolean).join(" at ") ||
+            alumni.professional_field ||
+            (alumni.experience_years !== null && alumni.experience_years !== undefined
+              ? `${alumni.experience_years} years experience`
+              : "Alumni");
+        }
+
+        const skills = (user.user_skills ?? [])
+          .map((us) => extractRelation(us.skills)?.name)
+          .filter((name): name is string => Boolean(name));
+
+        const projectCount = (user.projects ?? []).length;
+        const score = scores.get(user.id) ?? {
+          reasons: new Set(),
+          score: 0,
+        };
+
         let adjustedScore =
           score.score +
           profileCompletenessScore({
             bio: user.bio,
-            hasAcademicProfile: Boolean(academicProfile),
-            projectCount: projectCounts.get(user.id) ?? 0,
+            hasAcademicProfile: Boolean(student || alumni),
+            projectCount,
             skillCount: skills.length,
           });
 
         if (
           ownProfile?.details.universityId &&
-          academicProfile?.university_id === ownProfile.details.universityId
+          universityId === ownProfile.details.universityId
         ) {
           adjustedScore += 12;
           score.reasons.add("Same university");
@@ -508,7 +385,7 @@ export const searchDiscover = cache(
 
         if (
           ownProfile?.details.departmentId &&
-          academicProfile?.department_id === ownProfile.details.departmentId
+          departmentId === ownProfile.details.departmentId
         ) {
           adjustedScore += 8;
           score.reasons.add("Same department");
@@ -523,55 +400,184 @@ export const searchDiscover = cache(
           avatarUrl: user.avatar_url,
           bio: user.bio,
           connectionState: connectionStates.get(user.id) ?? { kind: "none" },
-          departmentName: academicProfile?.department_id
-            ? names.departments.get(academicProfile.department_id) ?? null
-            : null,
+          departmentName,
           fullName: user.full_name,
           id: user.id,
           matchReasons: Array.from(score.reasons).slice(0, 4),
           role: user.role,
-          roleLine: roleLines.get(user.id) ?? null,
+          roleLine,
           score: adjustedScore,
           skills: skills.slice(0, 5),
-          universityName: academicProfile?.university_id
-            ? names.universities.get(academicProfile.university_id) ?? null
-            : null,
+          universityName,
           username: user.username,
         };
       })
       .sort((a, b) => b.score - a.score)
       .slice(0, 10);
 
-    return {
-      opportunities: ((opportunities.data ?? []) as {
+    const formattedProjects: DiscoverProject[] = projectList.map((project) => {
+      const author = extractRelation(project.users);
+      return {
+        authorName: author?.full_name ?? null,
+        authorUsername: author?.username ?? null,
+        description: project.description,
+        id: project.id,
+        projectUrl: project.project_url,
+        title: project.title,
+      };
+    });
+
+    const formattedOpportunities: DiscoverOpportunity[] = (
+      (opportunities.data ?? []) as {
         company_name: string;
         deadline: string | null;
         id: string;
         location: string | null;
         title: string;
         type: string;
-      }[]).map((opportunity) => ({
-        companyName: opportunity.company_name,
-        deadline: opportunity.deadline,
-        id: opportunity.id,
-        location: opportunity.location,
-        title: opportunity.title,
-        type: opportunity.type,
-      })),
+      }[]
+    ).map((opportunity) => ({
+      companyName: opportunity.company_name,
+      deadline: opportunity.deadline,
+      id: opportunity.id,
+      location: opportunity.location,
+      title: opportunity.title,
+      type: opportunity.type,
+    }));
+
+    return {
+      opportunities: formattedOpportunities,
       people,
-      projects: ((matchedProjects.data ?? []) as DbProject[]).map((project) => {
-        const author = projectAuthors.get(project.user_id);
-        return {
-          authorName: author?.fullName ?? null,
-          authorUsername: author?.username ?? null,
-          description: project.description,
-          id: project.id,
-          projectUrl: project.project_url,
-          title: project.title,
-        };
-      }),
+      projects: formattedProjects,
       query,
       research: [],
     };
   }
 );
+
+export type SuggestedConnectionPerson = {
+  avatarUrl: string | null;
+  departmentName: string | null;
+  fullName: string | null;
+  id: string;
+  matchBadge: string;
+  role: "student" | "alumni";
+  roleLine: string | null;
+  score: number;
+  skills: string[];
+  universityName: string | null;
+  username: string | null;
+};
+
+export const getSuggestedConnections = cache(
+  async (limit = 9): Promise<SuggestedConnectionPerson[]> => {
+    const supabase = await createClient();
+    const ownProfile = await getOwnProfile();
+
+    if (!ownProfile) {
+      return [];
+    }
+
+    const viewerId = ownProfile.id;
+
+    // Fetch existing connections (accepted or pending) to exclude
+    const { data: existingConnections } = await supabase
+      .from("connections")
+      .select("requester_id, receiver_id, status")
+      .or(`requester_id.eq.${viewerId},receiver_id.eq.${viewerId}`)
+      .in("status", ["pending", "accepted"]);
+
+    const excludedUserIds = new Set<string>([viewerId]);
+    (existingConnections ?? []).forEach((c) => {
+      excludedUserIds.add(c.requester_id);
+      excludedUserIds.add(c.receiver_id);
+    });
+
+    // Fetch candidates
+    const { data: rawUsers } = await supabase
+      .from("users")
+      .select(RELATIONAL_DISCOVER_USER_SELECT)
+      .neq("role", "admin")
+      .limit(30);
+
+    const candidates: SuggestedConnectionPerson[] = ((rawUsers ?? []) as DiscoverRelationalUser[])
+      .filter((user) => !excludedUserIds.has(user.id) && user.role !== "admin")
+      .map((user) => {
+        const student = extractRelation(user.student_profiles);
+        const alumni = extractRelation(user.alumni_profiles);
+        const universityId = student?.university_id || alumni?.university_id || null;
+        const departmentId = student?.department_id || alumni?.department_id || null;
+        const universityName =
+          extractRelation(student?.universities)?.name ??
+          extractRelation(alumni?.universities)?.name ??
+          null;
+        const departmentName =
+          extractRelation(student?.departments)?.name ??
+          extractRelation(alumni?.departments)?.name ??
+          null;
+
+        let roleLine: string | null = null;
+        if (student) {
+          roleLine = student.graduation_year
+            ? `Student · Class of ${student.graduation_year}`
+            : "Student";
+        } else if (alumni) {
+          roleLine =
+            [alumni.job_title, alumni.company_name].filter(Boolean).join(" at ") ||
+            alumni.professional_field ||
+            "Alumni";
+        }
+
+        const skills = (user.user_skills ?? [])
+          .map((us) => extractRelation(us.skills)?.name)
+          .filter((name): name is string => Boolean(name));
+
+        // Calculate relevance
+        let score = 0;
+        let matchBadge: string | null = null;
+
+        if (ownProfile.details.universityId && universityId === ownProfile.details.universityId) {
+          score += 25;
+          matchBadge = "Same University";
+        }
+        if (ownProfile.details.departmentId && departmentId === ownProfile.details.departmentId) {
+          score += 15;
+          if (!matchBadge) matchBadge = "Same Department";
+        }
+
+        const viewerSkillNames = new Set(ownProfile.skills.map((s) => s.name.toLowerCase()));
+        const sharedSkills = skills.filter((s) => viewerSkillNames.has(s.toLowerCase()));
+        if (sharedSkills.length > 0) {
+          score += sharedSkills.length * 10;
+          if (!matchBadge) matchBadge = `${sharedSkills.length} Shared Skill${sharedSkills.length > 1 ? "s" : ""}`;
+        }
+
+        if (ownProfile.details.role === "student" && user.role === "alumni") {
+          score += 10;
+          if (!matchBadge) matchBadge = "Alumni Mentor";
+        } else if (ownProfile.details.role === "alumni" && user.role === "student") {
+          score += 10;
+          if (!matchBadge) matchBadge = "University Student";
+        }
+
+        return {
+          avatarUrl: user.avatar_url,
+          departmentName,
+          fullName: user.full_name,
+          id: user.id,
+          matchBadge: matchBadge ?? "Recommended",
+          role: user.role as "student" | "alumni",
+          roleLine,
+          score,
+          skills: skills.slice(0, 3),
+          universityName,
+          username: user.username,
+        };
+      })
+      .sort((a, b) => b.score - a.score)
+      .slice(0, limit);
+
+    return candidates;
+  }
+);
+

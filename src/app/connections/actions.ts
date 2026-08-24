@@ -11,6 +11,7 @@ function formString(formData: FormData, key: string) {
 
 function refreshConnectionPaths(username?: string | null) {
   revalidatePath("/connections");
+  revalidatePath("/dashboard");
   revalidatePath("/discover");
   revalidatePath("/profile");
 

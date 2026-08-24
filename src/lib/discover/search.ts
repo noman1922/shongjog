@@ -48,10 +48,10 @@ export function getSearchTerms(rawQuery: string) {
 
   return {
     patterns: Array.from(terms)
-      .slice(0, 8)
+      .slice(0, 4)
       .map((term) => `%${term.replaceAll("%", "\\%").replaceAll("_", "\\_")}%`),
     query,
-    terms: Array.from(terms).slice(0, 8),
+    terms: Array.from(terms).slice(0, 4),
   };
 }
 

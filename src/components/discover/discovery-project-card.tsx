@@ -1,44 +1,48 @@
 import { ExternalLink, FolderKanban } from "lucide-react";
 import Link from "next/link";
 
+import { ShongjogCard } from "@/components/shongjog/surface";
 import type { DiscoverProject } from "@/lib/discover/data";
 
 export function DiscoveryProjectCard({ project }: { project: DiscoverProject }) {
   return (
-    <article className="rounded-xl border border-[#BFC9C3] bg-white p-4 shadow-[0_4px_12px_rgba(30,41,59,0.04)]">
+    <ShongjogCard className="p-5 transition-all duration-200 hover:border-primary/40 hover:shadow-md">
       <div className="flex items-start gap-3">
-        <span className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-[#ECEEEB] text-[#0F5A47]">
-          <FolderKanban aria-hidden="true" className="size-5" />
+        <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
+          <FolderKanban className="size-5" />
         </span>
         <div className="min-w-0 flex-1">
-          <h3 className="break-words font-bold text-[#191C1B]">{project.title}</h3>
+          <h3 className="break-words font-bold text-sm sm:text-base text-foreground leading-snug">
+            {project.title}
+          </h3>
           {project.authorUsername ? (
             <Link
-              className="mt-1 block text-sm text-[#0F5A47] hover:underline"
+              className="mt-1 block text-xs font-semibold text-primary hover:underline"
               href={`/profile/${project.authorUsername}`}
             >
-              {project.authorName ?? "View author"}
+              by {project.authorName ?? "member"}
             </Link>
           ) : null}
+
           {project.description ? (
-            <p className="mt-3 line-clamp-3 text-sm leading-6 text-[#3F4945]">
+            <p className="mt-2.5 line-clamp-3 text-xs sm:text-sm leading-relaxed text-muted-foreground">
               {project.description}
             </p>
           ) : null}
+
           {project.projectUrl ? (
             <a
-              className="mt-3 inline-flex min-h-10 items-center gap-2 rounded-lg border border-[#0F5A47] px-3 text-sm font-semibold text-[#0F5A47] hover:bg-[#0F5A47]/5"
+              className="mt-3.5 inline-flex min-h-8 items-center gap-1.5 rounded-full border border-primary/30 bg-primary/5 dark:bg-primary/15 px-3.5 text-xs font-semibold text-primary hover:bg-primary hover:text-white transition-colors"
               href={project.projectUrl}
               rel="noreferrer"
               target="_blank"
             >
-              Open project
-              <ExternalLink aria-hidden="true" className="size-4" />
+              <span>View Project</span>
+              <ExternalLink className="size-3.5" />
             </a>
           ) : null}
         </div>
       </div>
-    </article>
+    </ShongjogCard>
   );
 }
-

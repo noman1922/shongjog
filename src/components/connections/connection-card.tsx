@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 
 import {
@@ -8,17 +9,7 @@ import {
 } from "@/app/connections/actions";
 import { Button } from "@/components/ui/button";
 import type { ConnectionRecord } from "@/lib/connections/types";
-
-function initials(name: string | null) {
-  return (
-    name
-      ?.split(" ")
-      .map((part) => part[0])
-      .join("")
-      .slice(0, 2)
-      .toUpperCase() || "S"
-  );
-}
+import { getInitials } from "@/lib/utils";
 
 export function ConnectionCard({
   connection,
@@ -30,37 +21,49 @@ export function ConnectionCard({
   const profileHref = connection.otherUser.username
     ? `/profile/${connection.otherUser.username}`
     : "/profile";
+  const isStudent = connection.otherUser.role === "student";
 
   return (
-    <article className="rounded-lg border border-[#BFC9C3]/80 bg-[#F8FAF7] p-4">
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-        <Link className="flex min-w-0 gap-3" href={profileHref}>
-          {connection.otherUser.avatarUrl ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
-              alt=""
-              className="size-14 shrink-0 rounded-full border border-[#BFC9C3] object-cover"
-              src={connection.otherUser.avatarUrl}
-            />
-          ) : (
-            <div className="flex size-14 shrink-0 items-center justify-center rounded-full border border-[#BFC9C3] bg-[#E6E9E5] text-sm font-semibold text-[#0F5A47]">
-              {initials(connection.otherUser.fullName)}
-            </div>
-          )}
-          <span className="min-w-0 space-y-1">
-            <span className="block break-words font-semibold text-[#191C1B]">
+    <article className="rounded-2xl border border-border/80 dark:border-slate-800 bg-card p-4 transition-all duration-200 hover:border-primary/40 hover:shadow-sm">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <Link className="flex min-w-0 items-center gap-3.5 group" href={profileHref}>
+          <div className="relative size-13 shrink-0 overflow-hidden rounded-full ring-2 ring-primary/20 shadow-sm">
+            {connection.otherUser.avatarUrl ? (
+              <Image
+                alt={connection.otherUser.fullName ?? "Avatar"}
+                className="size-full rounded-full object-cover"
+                height={52}
+                src={connection.otherUser.avatarUrl}
+                width={52}
+              />
+            ) : (
+              <div className="flex size-full items-center justify-center rounded-full bg-primary/10 text-primary text-sm font-bold">
+                {getInitials(connection.otherUser.fullName)}
+              </div>
+            )}
+          </div>
+
+          <div className="min-w-0 space-y-0.5">
+            <span className="block break-words font-bold text-sm sm:text-base text-foreground group-hover:text-primary transition-colors">
               {connection.otherUser.fullName ?? "Unnamed member"}
             </span>
-            <span className="block break-all text-sm text-[#747875]">
+            <span className="block text-xs text-muted-foreground">
               @{connection.otherUser.username ?? "profile"}
             </span>
-            <span className="block text-sm capitalize text-[#747875]">
+            <span
+              className={`inline-block text-[11px] font-semibold capitalize ${
+                isStudent
+                  ? "text-blue-600 dark:text-blue-400"
+                  : "text-emerald-600 dark:text-emerald-400"
+              }`}
+            >
               {connection.otherUser.role}
             </span>
-          </span>
+          </div>
         </Link>
 
-        <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row">
+        {/* Actions */}
+        <div className="flex w-full flex-wrap gap-2 sm:w-auto">
           {mode === "received" ? (
             <>
               <form action={acceptConnectionRequestAction}>
@@ -70,7 +73,10 @@ export function ConnectionCard({
                   type="hidden"
                   value={connection.otherUser.username ?? ""}
                 />
-                <Button className="h-11 w-full sm:w-auto" type="submit">
+                <Button
+                  className="h-9 rounded-full bg-primary hover:bg-primary/90 text-white text-xs font-semibold px-4 shadow-sm"
+                  type="submit"
+                >
                   Accept
                 </Button>
               </form>
@@ -82,7 +88,7 @@ export function ConnectionCard({
                   value={connection.otherUser.username ?? ""}
                 />
                 <Button
-                  className="h-11 w-full sm:w-auto"
+                  className="h-9 rounded-full border border-border bg-card hover:bg-destructive/10 hover:text-destructive text-xs font-semibold px-4"
                   type="submit"
                   variant="outline"
                 >
@@ -100,8 +106,12 @@ export function ConnectionCard({
                 type="hidden"
                 value={connection.otherUser.username ?? ""}
               />
-              <Button className="h-11 w-full sm:w-auto" type="submit" variant="outline">
-                Cancel
+              <Button
+                className="h-9 rounded-full border border-border bg-card hover:bg-destructive/10 hover:text-destructive text-xs font-semibold px-4"
+                type="submit"
+                variant="outline"
+              >
+                Cancel Request
               </Button>
             </form>
           ) : null}
@@ -114,7 +124,11 @@ export function ConnectionCard({
                 type="hidden"
                 value={connection.otherUser.username ?? ""}
               />
-              <Button className="h-11 w-full sm:w-auto" type="submit" variant="outline">
+              <Button
+                className="h-9 rounded-full border border-border bg-card hover:bg-destructive/10 hover:text-destructive text-xs font-semibold px-4"
+                type="submit"
+                variant="outline"
+              >
                 Remove
               </Button>
             </form>

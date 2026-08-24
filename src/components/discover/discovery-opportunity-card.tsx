@@ -1,5 +1,6 @@
 import { BriefcaseBusiness } from "lucide-react";
 
+import { ShongjogCard } from "@/components/shongjog/surface";
 import type { DiscoverOpportunity } from "@/lib/discover/data";
 
 export function DiscoveryOpportunityCard({
@@ -8,23 +9,24 @@ export function DiscoveryOpportunityCard({
   opportunity: DiscoverOpportunity;
 }) {
   return (
-    <article className="rounded-xl border border-[#BFC9C3] bg-white p-4 shadow-[0_4px_12px_rgba(30,41,59,0.04)]">
+    <ShongjogCard className="p-4 transition-all duration-200 hover:border-primary/40 hover:shadow-md">
       <div className="flex items-start gap-3">
-        <span className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-[#ECEEEB] text-[#0F5A47]">
-          <BriefcaseBusiness aria-hidden="true" className="size-5" />
+        <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
+          <BriefcaseBusiness className="size-5" />
         </span>
-        <div>
-          <p className="text-xs font-semibold uppercase text-[#14B8A6]">
+        <div className="min-w-0 flex-1">
+          <span className="inline-block rounded-full bg-amber-100 dark:bg-amber-950/60 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-amber-800 dark:text-amber-300">
             {opportunity.type}
-          </p>
-          <h3 className="mt-1 font-bold text-[#191C1B]">{opportunity.title}</h3>
-          <p className="mt-1 text-sm text-[#3F4945]">
+          </span>
+          <h3 className="mt-1 font-bold text-sm sm:text-base text-foreground leading-snug">
+            {opportunity.title}
+          </h3>
+          <p className="mt-0.5 text-xs text-muted-foreground">
             {opportunity.companyName}
-            {opportunity.location ? ` • ${opportunity.location}` : ""}
+            {opportunity.location ? ` · ${opportunity.location}` : ""}
           </p>
         </div>
       </div>
-    </article>
+    </ShongjogCard>
   );
 }
-

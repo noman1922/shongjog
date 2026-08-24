@@ -1,11 +1,13 @@
+import { ArrowLeft, Users } from "lucide-react";
 import { redirect } from "next/navigation";
 
 import { ConnectionsSection } from "@/components/connections/connections-section";
 import { AppShell } from "@/components/shongjog/app-shell";
+import { ShongjogCard } from "@/components/shongjog/surface";
 import { LinkButton } from "@/components/ui/button";
 import { getConnectionsOverview } from "@/lib/connections/data";
 import { getOnboardingStatus } from "@/lib/onboarding/status";
-import { getOwnProfile } from "@/lib/profile/data";
+import { getViewerProfile } from "@/lib/profile/data";
 import { createClient } from "@/lib/supabase/server";
 
 export default async function ConnectionsPage() {
@@ -26,7 +28,7 @@ export default async function ConnectionsPage() {
 
   const [overview, profile] = await Promise.all([
     getConnectionsOverview(),
-    getOwnProfile(),
+    getViewerProfile(),
   ]);
 
   if (!profile) {
@@ -35,46 +37,55 @@ export default async function ConnectionsPage() {
 
   return (
     <AppShell active="Circles" profile={profile}>
-      <div className="mx-auto w-full max-w-[1120px] space-y-5 px-4 pb-24 pt-6 sm:px-6 lg:px-8 lg:pb-8">
-        <header className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-          <div className="space-y-2">
-            <p className="text-sm font-semibold uppercase tracking-wide text-[#14B8A6]">
-              Network
-            </p>
-            <h1 className="text-2xl font-bold tracking-tight text-[#191C1B] sm:text-3xl">
-              Circles
-            </h1>
-            <p className="max-w-2xl text-sm leading-6 text-[#3F4945]">
-              Manage pending requests and people you are connected with.
-            </p>
-          </div>
-          <LinkButton
-            className="h-11 w-full border-[#0F5A47] text-[#0F5A47] sm:w-auto"
-            href="/profile"
-            variant="outline"
-          >
-            Back to profile
-          </LinkButton>
-        </header>
+      <div className="mx-auto w-full max-w-5xl space-y-6 px-4 sm:px-6">
+        {/* Header Hero */}
+        <ShongjogCard className="p-6 sm:p-8">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <div className="flex items-center gap-2 mb-1.5">
+                <Users className="size-4 text-primary" />
+                <span className="text-xs font-bold uppercase tracking-wider text-primary">
+                  Academic Network
+                </span>
+              </div>
+              <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-foreground">
+                Your Circles
+              </h1>
+              <p className="mt-1 text-xs sm:text-sm text-muted-foreground">
+                Manage invitations, pending requests, and verified connections.
+              </p>
+            </div>
 
-        <div className="grid gap-5">
+            <LinkButton
+              className="h-10 rounded-full border border-border bg-card text-foreground hover:bg-muted text-xs font-semibold px-5 shrink-0 shadow-sm"
+              href="/profile"
+              variant="outline"
+            >
+              <ArrowLeft className="size-3.5" />
+              <span>Back to Profile</span>
+            </LinkButton>
+          </div>
+        </ShongjogCard>
+
+        {/* Sections */}
+        <div className="grid gap-6">
           <ConnectionsSection
             connections={overview.receivedPending}
-            emptyText="No pending requests received."
+            emptyText="No pending invitations received."
             mode="received"
-            title="Pending requests received"
+            title="Invitations Received"
           />
           <ConnectionsSection
             connections={overview.sentPending}
-            emptyText="No sent requests are pending."
+            emptyText="No sent invitations are currently pending."
             mode="sent"
-            title="Sent requests"
+            title="Sent Invitations"
           />
           <ConnectionsSection
             connections={overview.connected}
-            emptyText="No connections yet."
+            emptyText="You have not connected with anyone yet. Explore Discover to build your network."
             mode="connected"
-            title="Connected users"
+            title="Connected Members"
           />
         </div>
       </div>
