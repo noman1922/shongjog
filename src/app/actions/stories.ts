@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 
+import { uploadMedia } from "@/lib/cloudinary";
 import { createClient } from "@/lib/supabase/server";
 
 const storySchema = z.object({
@@ -18,6 +19,40 @@ export type CreateStoryInput = {
   headline: string;
   mediaUrl: string;
 };
+
+export async function uploadStoryImageAction(formData: FormData) {
+  try {
+    const supabase = await createClient();
+    const {
+      data: { user },
+      error: authError,
+    } = await supabase.auth.getUser();
+
+    if (authError || !user) {
+      return { error: "Please sign in to upload photos.", success: false };
+    }
+
+    const file = formData.get("file") as File | null;
+    if (!file || typeof file === "string") {
+      return { error: "No image file provided.", success: false };
+    }
+
+    if (file.size > 10 * 1024 * 1024) {
+      return { error: "Image size must be under 10MB.", success: false };
+    }
+
+    const buffer = Buffer.from(await file.arrayBuffer());
+    const uploadResult = await uploadMedia(buffer, "shongjog/stories");
+
+    return { success: true, url: uploadResult.secureUrl };
+  } catch (err) {
+    console.error("Story image upload action error:", err);
+    return {
+      error: err instanceof Error ? err.message : "Failed to upload photo.",
+      success: false,
+    };
+  }
+}
 
 export async function createStoryAction(payload: CreateStoryInput) {
   const parsed = storySchema.safeParse(payload);

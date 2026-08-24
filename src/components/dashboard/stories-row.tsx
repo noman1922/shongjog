@@ -24,7 +24,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useRef, useState, useTransition } from "react";
 
-import { createStoryAction } from "@/app/actions/stories";
+import { createStoryAction, uploadStoryImageAction } from "@/app/actions/stories";
 import { Button } from "@/components/ui/button";
 import type { PublicProfile } from "@/lib/profile/types";
 import { getInitials } from "@/lib/utils";
@@ -260,20 +260,14 @@ export function StoriesRow({
       formData.append("file", file);
       formData.append("folder", "shongjog/stories");
 
-      // Isolated media endpoint - DOES NOT TOUCH USER PROFILE AVATAR
-      const response = await fetch("/api/upload/media", {
-        body: formData,
-        method: "POST",
-      });
+      // Server Action upload using Cloudinary private credentials on server
+      const result = await uploadStoryImageAction(formData);
 
-      const data = await response.json();
-      if (!response.ok || data.error) {
-        throw new Error(data.error || "Failed to upload photo.");
+      if (result.error || !result.url) {
+        throw new Error(result.error || "Failed to upload photo.");
       }
 
-      if (data.url) {
-        setNewImageUrl(data.url);
-      }
+      setNewImageUrl(result.url);
     } catch (err) {
       console.error("Story image upload failed:", err);
       setUploadError(
