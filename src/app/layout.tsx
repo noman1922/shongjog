@@ -17,16 +17,18 @@ export const metadata: Metadata = {
     "Premier university student and alumni networking platform in Bangladesh. Connect, collaborate, and discover opportunities.",
   icons: {
     apple: [
+      { type: "image/svg+xml", url: "/icon.svg" },
       { type: "image/png", url: "/apple-icon.png" },
       { type: "image/png", url: "/icon.png" },
     ],
     icon: [
+      { type: "image/svg+xml", url: "/icon.svg" },
       { type: "image/png", url: "/icon.png" },
       { type: "image/png", url: "/brand/icon.png" },
     ],
-    shortcut: "/icon.png",
+    shortcut: "/icon.svg",
   },
-  title: "Shongjog - University Student & Alumni Network",
+  title: "Shongjog | University Student & Alumni Network",
 };
 
 export default function RootLayout({
@@ -47,7 +49,7 @@ export default function RootLayout({
           }}
         />
       </head>
-      <body className="min-h-full flex flex-col bg-background text-foreground selection:bg-primary/20 selection:text-primary">
+      <body className="min-h-full flex flex-col bg-background text-foreground overflow-x-hidden selection:bg-primary/20 selection:text-primary">
         {children}
       </body>
     </html>
