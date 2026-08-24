@@ -21,14 +21,14 @@ export default async function AdminLoginRoute({
       redirect("/admin");
     }
 
-    redirect("/profile");
+    redirect("/dashboard");
   }
 
   const params = await searchParams;
   const error =
     params.error === "forbidden"
-      ? "This Google account is not authorized as a Shongjog admin."
-      : undefined;
+      ? "This account is not authorized as a Shongjog admin."
+      : params.error;
 
   return <AdminLoginPage error={error} />;
 }
